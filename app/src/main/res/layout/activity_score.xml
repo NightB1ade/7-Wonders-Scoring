@@ -30,25 +30,14 @@
         android:layout_marginStart="8dp"
         android:layout_marginLeft="8dp"
         android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginBottom="19dp"
         android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="@+id/textNull"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/textNull"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <TextView
-            android:id="@+id/p1Name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="p1" />
-
-        <TextView
-            android:id="@+id/p2Name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="p2" />
-    </LinearLayout>
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/textNull"

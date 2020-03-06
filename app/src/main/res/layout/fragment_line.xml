@@ -21,23 +21,14 @@
 
         <EditText
             android:id="@+id/p1Score"
-            android:layout_width="wrap_content"
+            android:layout_width="0px"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:ems="10"
+            android:importantForAutofill="no"
             android:inputType="number"
-            android:textSize="12sp"
-            android:importantForAutofill="no" />
+            android:textSize="12sp" />
 
-        <EditText
-            android:id="@+id/p2Score"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:ems="10"
-            android:inputType="number"
-            android:textSize="12sp"
-            android:importantForAutofill="no" />
     </LinearLayout>
 
     <TextView
