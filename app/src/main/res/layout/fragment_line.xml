@@ -17,19 +17,7 @@
         android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/trackName"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <EditText
-            android:id="@+id/p1Score"
-            android:layout_width="0px"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:ems="10"
-            android:importantForAutofill="no"
-            android:inputType="numberSigned|number"
-            android:textSize="12sp" />
-
-    </LinearLayout>
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/trackName"
