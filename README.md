@@ -1,18 +1,19 @@
 # 7-Wonders-Scoring
 
-## Version 2
+## Version 3
 
-* Very simple app prototype
+* Simple app prototype
 * First screen is player name entry - list of players names built and shown below
-* Second screen is dynamic to number of players but hardcoded to 4 score tracks
+* Second screen is dynamic to number of players and sets up score tracks based on config file
 
 ## Next steps
-Brain dump - will not be everything
+Current brain dump - also see TODOs in code
 
 - [x] don't allow zero players
 - [x] make number players dynamic based on first screen
 - [x] default player names to "player X" and pre-selected for easy edit/entry
-- [ ] make score tracks dynamic based on read in data config?
+- [x] create game config xml file and parser
+- [x] make score tracks dynamic based on read in data config
 - [ ] add total track
 - [ ] allow removal of players on first screen?
 - [ ] player name editing

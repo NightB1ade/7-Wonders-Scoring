@@ -15,6 +15,7 @@ const val PLAYER_LIST = "playerlist"
 
 // Simple class for storing strings between config changes!
 // For example - screen rotation (config change) can cause the main activity to be re-built
+// TODO - Expand to store player type (colour/city etc)
 class ListFragment : Fragment() {
     var strings = mutableListOf<String>()
 
@@ -41,6 +42,11 @@ class MainActivity : AppCompatActivity() {
         val view = findViewById<LinearLayout>(R.id.rootLayout)
         val list = supportFragmentManager.findFragmentByTag(PLAYER_LIST)
 
+        val xmlconfig = resources.openRawResource(R.raw.games)
+        val games = GamesParser(xmlconfig)
+        // TODO: Use this to supply list of games to select from
+        // TODO: Use this to allow drop-down selection for players
+
         if (savedInstanceState == null) {
             // Create initial store of stuff
             supportFragmentManager
@@ -53,14 +59,14 @@ class MainActivity : AppCompatActivity() {
                 for (message in list.strings)
                     view?.addView(getText(message))
         }
-        if (list is ListFragment) {
-            setPlayer(list.strings.size)
-        } else {
-            setPlayer(0)
-        }
+        var numPlayers = 0
+        if (list is ListFragment)
+            numPlayers = list.strings.size
+        setPlayerText(numPlayers)
+        enableDone()
     }
 
-    fun setPlayer(players: Int) {
+    fun setPlayerText(players: Int) {
         val editText = findViewById<EditText>(R.id.editPlayer)
         val num = players + 1
         editText.setText("player " + num.toString())
@@ -75,6 +81,19 @@ class MainActivity : AppCompatActivity() {
         return tv_dynamic
     }
 
+    fun enableDone() {
+        // Enable done button
+        val doneButton = findViewById<Button>(R.id.buttonDone)
+        val list = supportFragmentManager.findFragmentByTag(PLAYER_LIST)
+        if (list is ListFragment) {
+            if (list.strings.size > 0) {
+                doneButton.isEnabled = true
+                return
+            }
+        }
+        doneButton.isEnabled = false
+    }
+
     fun addPlayer(view: View) {
         val editText = findViewById<EditText>(R.id.editPlayer)
         val message = editText.text.toString()
@@ -84,14 +103,12 @@ class MainActivity : AppCompatActivity() {
         val list = supportFragmentManager.findFragmentByTag(PLAYER_LIST)
         if (list is ListFragment) {
             list.strings.add(message)
-            setPlayer(list.strings.size)
+            setPlayerText(list.strings.size)
         }
         // add new text to layout
         view?.addView(getText(message))
 
-        // Enable done button
-        val doneButton = findViewById<Button>(R.id.buttonDone)
-        doneButton.isEnabled = true
+        enableDone()
     }
 
     fun donePlayers(view: View) {

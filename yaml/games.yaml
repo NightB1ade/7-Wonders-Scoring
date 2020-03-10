@@ -1,0 +1,78 @@
+# Convert this to XML using: https://codebeautify.org/yaml-to-json-xml-csv
+
+games:
+  - name: 7 wonders
+    players:
+      - Abu Simbel
+      - Alexandria
+      - Angkor Wat
+      - Atlantis
+      - Babylon
+      - Byzantium
+      - Catan
+      - Ephesos
+      - Gizah
+      - Halikarnassos
+      - Manneken Pis
+      - Rhodes
+      - Roma
+      - Olympia
+      - Persepolis
+      - Petra
+      - Sparta
+      - Stonehenge
+      - The Great Wall
+      - Venezia
+    tracks:
+      - name: Military
+        colour: FF6600
+        default: true
+      - name: Coins
+        colour: CCFFFF
+        default: true
+      - name: Wonder
+        colour: FFFF00
+        default: true
+      - name: Civilian
+        colour: 0000CC
+        default: true
+      - name: Science
+        colour: 009900
+        default: true
+        special:
+          variables:
+            - Compasses
+            - Tablets
+            - Cogs
+          # Reverse Polish Notation of: A*A + B*B + C*C + min(A,min(B,C))*7
+          calculation: AA*BB*+CC*+BCnAn7*+
+      - name: Commercial
+        colour: FFCC00
+        default: true
+      - name: Guilds
+        colour: 9900CC
+        default: true
+      - name: Leaders
+        colour: FFFFFF
+        default: false
+      - name: Cities
+        colour: FFFFCC
+        default: false
+  - name: King/Queendomino
+    players:
+      - Blue
+      - Green
+      - Orange
+      - Pink
+      - Purple
+      - Red
+      - White
+      - Yellow
+    tracks:
+      - name: Coins
+        colour: 996600
+        default: false
+      - name: Fields
+        colour: FFFF00
+        default: true
+
