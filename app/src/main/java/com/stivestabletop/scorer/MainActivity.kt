@@ -15,7 +15,6 @@ const val PLAYER_LIST = "playerlist"
 
 // Simple class for storing strings between config changes!
 // For example - screen rotation (config change) can cause the main activity to be re-built
-// TODO - Expand to store player type (colour/city etc)
 class PlayerDataFragment : Fragment() {
     var gamename = ""
     var playernames = mutableListOf<String>()
@@ -137,9 +136,9 @@ class MainActivity : AppCompatActivity() {
     // Enable done button if we have at least one player
     fun enableDone() {
         val doneButton = findViewById<Button>(R.id.buttonDone)
-        val list = supportFragmentManager.findFragmentByTag(PLAYER_LIST)
-        if (list is PlayerDataFragment) {
-            if (list.playernames.size > 0) {
+        val data = supportFragmentManager.findFragmentByTag(PLAYER_LIST)
+        if (data is PlayerDataFragment) {
+            if (data.playernames.size > 0) {
                 doneButton.isEnabled = true
                 return
             }

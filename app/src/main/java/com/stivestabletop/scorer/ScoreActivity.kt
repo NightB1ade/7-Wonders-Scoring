@@ -1,5 +1,6 @@
 package com.stivestabletop.scorer
 
+import android.app.AlertDialog
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
@@ -8,10 +9,7 @@ import android.text.InputFilter
 import android.text.InputFilter.LengthFilter
 import android.text.InputType
 import android.text.TextWatcher
-import android.view.Gravity
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.LinearLayout
@@ -22,6 +20,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.children
 import androidx.fragment.app.Fragment
 
+const val TRACKS_LIST = "trackslist"
 
 @RequiresApi(Build.VERSION_CODES.O)
 fun getContrastTextColour(bg: Int): Int {
@@ -77,7 +76,14 @@ class TrackFragment : Fragment() {
         val view = track.findViewById<LinearLayout>(R.id.scoreLayout)
         for (num in 1..players)
             view?.addView(getScoreView(num, tname, !total))
+
         return track
+    }
+
+    override fun onHiddenChanged(hidden: Boolean) {
+        super.onHiddenChanged(hidden)
+        // TODO - do this for every hide?
+        calculateScores()
     }
 
     // Player score edit text
@@ -138,33 +144,35 @@ class TrackFragment : Fragment() {
         val fragments = activity?.supportFragmentManager?.fragments
         if (fragments != null) {
             for (fragment in fragments) {
-                // Ignore the total track, update that later
-                if (fragment.id != R.id.total_track) {
+                // Ignore the total track and track data, update totals later
+                if (fragment is TrackFragment && fragment.isVisible) {
                     // Find the score layout in the fragment
                     val view = fragment.view
-                    val layout = view?.findViewById<LinearLayout>(R.id.scoreLayout)
-                    val children = layout?.children
-                    if (children != null) {
-                        // Look at the edit text boxes in the fragment
-                        for (child in children) {
-                            if (child is EditText) {
-                                // Retrieve value and convert to number
-                                val text = child.text.toString()
-                                var value: Int
-                                try {
-                                    value = text.toInt()
-                                } catch (e: NumberFormatException) {
-                                    // Blank or maybe a negative symbol
-                                    value = 0
+                    if (view != null && view.id != R.id.total_track) {
+                        val layout = view.findViewById<LinearLayout>(R.id.scoreLayout)
+                        val children = layout?.children
+                        if (children != null) {
+                            // Look at the edit text boxes in the fragment
+                            for (child in children) {
+                                if (child is EditText) {
+                                    // Retrieve value and convert to number
+                                    val text = child.text.toString()
+                                    var value: Int
+                                    value = try {
+                                        text.toInt()
+                                    } catch (e: NumberFormatException) {
+                                        // Blank or maybe a negative symbol
+                                        0
+                                    }
+                                    // Store number in score map based on player number
+                                    if (scores.containsKey(child.id)) {
+                                        scores[child.id] = scores.getValue(child.id) + value
+                                    } else {
+                                        scores[child.id] = value
+                                    }
                                 }
-                                // Store number in score map based on player number
-                                if (scores.containsKey(child.id)) {
-                                    scores[child.id] = scores.getValue(child.id) + value
-                                } else {
-                                    scores[child.id] = value
-                                }
-                            }
-                        } // end for children
+                            } // end for children
+                        }
                     }
                 }
             } // end for fragments
@@ -180,6 +188,48 @@ class TrackFragment : Fragment() {
                 }
             }
         }
+    }
+}
+
+// Simple class for storing strings between config changes!
+class TracksDataFragment : Fragment() {
+    var players = 0
+
+    // TODO - probably doesn't need to be mutable!
+    private var tracks = mutableListOf<GamesParser.Track>()
+    private var actives = mutableListOf<Boolean>()
+
+    companion object {
+        fun newInstance(): TracksDataFragment {
+            return TracksDataFragment()
+        }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        // Will get saved between config changes!
+        retainInstance = true
+    }
+
+    fun setTracks(list: MutableList<GamesParser.Track>) {
+        tracks = list
+        for (track in tracks)
+            actives.add(track.default)
+    }
+
+    fun getTrackNames(): Array<CharSequence> {
+        val list = ArrayList<CharSequence>()
+        for (track in tracks)
+            list.add(track.name)
+        return list.toTypedArray()
+    }
+
+    fun getActives(): BooleanArray {
+        return actives.toBooleanArray()
+    }
+
+    fun setActives(selected: BooleanArray) {
+        actives = selected.toMutableList()
     }
 }
 
@@ -202,7 +252,7 @@ class ScoreActivity : AppCompatActivity() {
 
         // Add the player names to the names list
         val view = findViewById<LinearLayout>(R.id.playersLayout)
-        for (player in 0..(players - 1)) {
+        for (player in 0 until players) {
             val name = playernames[player] + "\n" + playertypes[player]
             view?.addView(getTitle(name))
         }
@@ -216,20 +266,83 @@ class ScoreActivity : AppCompatActivity() {
 
         if (savedInstanceState == null) {
             if (tracks != null) {
+                val datatrans = supportFragmentManager.beginTransaction()
+                val frag = TracksDataFragment.newInstance()
+                datatrans.add(R.id.trackScroll, frag, TRACKS_LIST)
+                datatrans.commit()
+
+                // Save the tracks and players for later in the data fragment
+                frag.setTracks(tracks as MutableList<GamesParser.Track>)
+                frag.players = players
+
+                // Set up initial tracks
                 val trans = supportFragmentManager.beginTransaction()
                 for (track in tracks) {
-                    if (track.default)
-                        trans.add(
-                            R.id.trackLayout,
-                            TrackFragment.newInstance(players, track.name, track.colour, false)
-                        )
+                    val tf = TrackFragment.newInstance(players, track.name, track.colour, false)
+                    trans.add(R.id.trackLayout, tf)
+                    if (!track.default)
+                        trans.hide(tf)
                 }
-                trans.add(
-                    R.id.trackLayout,
-                    TrackFragment.newInstance(players, "Total", "000000", true)
-                )
+                val tf = TrackFragment.newInstance(players, "Total", "000000", true)
+                trans.add(R.id.trackLayout, tf)
                 trans.commit()
             }
+        }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        val inflater: MenuInflater = menuInflater
+        // Not sure why this is an error in IDE but it compiles and works!
+        inflater.inflate(R.menu.menu_score, menu)
+        return true
+    }
+
+    fun doConfigure() {
+        val data = supportFragmentManager.findFragmentByTag(TRACKS_LIST)
+        if (data is TracksDataFragment) {
+            // Simple multi-select dialog
+            val actives = data.getActives()
+            val builder = AlertDialog.Builder(this)
+            builder.setTitle("Choose score tracks")
+            builder.setMultiChoiceItems(
+                data.getTrackNames(), actives
+            ) { dialog, which, isChecked ->
+                actives[which] = isChecked
+            }
+            // TODO: Add cancel
+            builder.setPositiveButton("DONE") { dialog, id ->
+                data.setActives(actives)
+                // Update tracks
+                val trans = supportFragmentManager.beginTransaction()
+                var num = 0
+                for (fragment in supportFragmentManager.fragments) {
+                    // Assumes the fragments are in the order we added them!
+                    if (fragment is TrackFragment) {
+                        val view = fragment.view
+                        if (view != null && view.id != R.id.total_track) {
+                            if (actives[num] && fragment.isHidden)
+                                trans.show(fragment)
+                            if (!actives[num] && fragment.isVisible)
+                                trans.hide(fragment)
+                            num++
+                        }
+                    }
+                }
+                trans.commit()
+            }
+            // Show the configuration dialog
+            builder.show()
+        }
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        // Handle item selection
+        return when (item.itemId) {
+            R.id.menu_config -> {
+                doConfigure()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
         }
     }
 

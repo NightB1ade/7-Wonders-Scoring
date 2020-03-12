@@ -3,4 +3,5 @@
     <string name="edit_message">Enter next players name</string>
     <string name="button_next">Next</string>
     <string name="button_done">Done</string>
+    <string name="menu_config">Configure</string>
 </resources>
