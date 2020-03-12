@@ -1,7 +1,8 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="UTF-8" ?>
 <root>
     <games>
         <name>7 wonders</name>
+        <players>City...</players>
         <players>Abu Simbel</players>
         <players>Alexandria</players>
         <players>Angkor Wat</players>
@@ -24,27 +25,28 @@
         <players>Venezia</players>
         <tracks>
             <name>Military</name>
-            <colour>FF6600</colour>
+            <colour>E62E25</colour>
             <default>true</default>
         </tracks>
         <tracks>
             <name>Coins</name>
-            <colour>CCFFFF</colour>
+            <hint>1 point for every three coins</hint>
+            <colour>9B7A19</colour>
             <default>true</default>
         </tracks>
         <tracks>
             <name>Wonder</name>
-            <colour>FFFF00</colour>
+            <colour>F5B463</colour>
             <default>true</default>
         </tracks>
         <tracks>
             <name>Civilian</name>
-            <colour>0000CC</colour>
+            <colour>0B4FD9</colour>
             <default>true</default>
         </tracks>
         <tracks>
             <name>Science</name>
-            <colour>339900</colour>
+            <colour>429F4D</colour>
             <default>true</default>
             <special>
                 <variables>Compasses</variables>
@@ -55,12 +57,12 @@
         </tracks>
         <tracks>
             <name>Commercial</name>
-            <colour>FFCC00</colour>
+            <colour>FFEB29</colour>
             <default>true</default>
         </tracks>
         <tracks>
             <name>Guilds</name>
-            <colour>9900CC</colour>
+            <colour>902796</colour>
             <default>true</default>
         </tracks>
         <tracks>
@@ -76,6 +78,7 @@
     </games>
     <games>
         <name>King/Queendomino</name>
+        <players>Colour...</players>
         <players>Blue</players>
         <players>Green</players>
         <players>Orange</players>
@@ -86,13 +89,70 @@
         <players>Yellow</players>
         <tracks>
             <name>Coins</name>
+            <hint>1 point for every three coins</hint>
             <colour>996600</colour>
             <default>false</default>
         </tracks>
         <tracks>
             <name>Fields</name>
-            <colour>FFFF00</colour>
+            <hint>crowns in fields times number of linked field tiles</hint>
+            <colour>FDDC29</colour>
             <default>true</default>
+        </tracks>
+        <tracks>
+            <name>Forests</name>
+            <hint>crowns in forests times number of linked forest tiles</hint>
+            <colour>3D7C36</colour>
+            <default>true</default>
+        </tracks>
+        <tracks>
+            <name>Lakes</name>
+            <hint>crowns in lakes times number of linked lake tiles</hint>
+            <colour>207DF5</colour>
+            <default>true</default>
+        </tracks>
+        <tracks>
+            <name>Prairies</name>
+            <hint>crowns in prairies times number of linked prairie tiles</hint>
+            <colour>90CC17</colour>
+            <default>true</default>
+        </tracks>
+        <tracks>
+            <name>Marshes</name>
+            <hint>crowns in marshes times number of linked marsh tiles</hint>
+            <colour>C08B62</colour>
+            <default>true</default>
+        </tracks>
+        <tracks>
+            <name>Mountains</name>
+            <hint>crowns in mountains times number of linked mountain tiles</hint>
+            <colour>3A1828</colour>
+            <default>true</default>
+        </tracks>
+        <tracks>
+            <name>Towns</name>
+            <hint>crowns in twons times number of linked town tiles</hint>
+            <colour>E42E24</colour>
+            <default>false</default>
+        </tracks>
+        <tracks>
+            <name>Territories</name>
+            <hint>points for buildings that has multipliers for number of separate territories
+            </hint>
+            <colour>E42E24</colour>
+            <default>false</default>
+        </tracks>
+        <tracks>
+            <name>Towers</name>
+            <hint>points for buildings that score towers</hint>
+            <colour>E42E24</colour>
+            <default>false</default>
+        </tracks>
+        <tracks>
+            <name>Buildings</name>
+            <hint>points for buildings that are worth points</hint>
+            <colour>E42E24</colour>
+            <default>false</default>
         </tracks>
     </games>
 </root>

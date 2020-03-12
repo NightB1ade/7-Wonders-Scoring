@@ -1,8 +1,10 @@
 # Convert this to XML using: https://codebeautify.org/yaml-to-json-xml-csv
+# Note: It can sometimes get the colours wrong e.g. 009900 gets converted to 0
 
 games:
   - name: 7 wonders
     players:
+      - City...
       - Abu Simbel
       - Alexandria
       - Angkor Wat
@@ -25,19 +27,20 @@ games:
       - Venezia
     tracks:
       - name: Military
-        colour: FF6600
+        colour: E62E25
         default: true
       - name: Coins
-        colour: CCFFFF
+        hint: 1 point for every three coins
+        colour: 9B7A19
         default: true
       - name: Wonder
-        colour: FFFF00
+        colour: F5B463
         default: true
       - name: Civilian
-        colour: 0000CC
+        colour: 0B4FD9
         default: true
       - name: Science
-        colour: 009900
+        colour: 429F4D
         default: true
         special:
           variables:
@@ -47,10 +50,10 @@ games:
           # Reverse Polish Notation of: A*A + B*B + C*C + min(A,min(B,C))*7
           calculation: AA*BB*+CC*+BCnAn7*+
       - name: Commercial
-        colour: FFCC00
+        colour: FFEB29
         default: true
       - name: Guilds
-        colour: 9900CC
+        colour: 902796
         default: true
       - name: Leaders
         colour: FFFFFF
@@ -60,6 +63,7 @@ games:
         default: false
   - name: King/Queendomino
     players:
+      - Colour...
       - Blue
       - Green
       - Orange
@@ -70,9 +74,48 @@ games:
       - Yellow
     tracks:
       - name: Coins
+        hint: 1 point for every three coins
         colour: 996600
         default: false
       - name: Fields
-        colour: FFFF00
+        hint: crowns in fields times number of linked field tiles
+        colour: FDDC29
         default: true
+      - name: Forests
+        hint: crowns in forests times number of linked forest tiles
+        colour: 3D7C36
+        default: true
+      - name: Lakes
+        hint: crowns in lakes times number of linked lake tiles
+        colour: 207DF5
+        default: true
+      - name: Prairies
+        hint: crowns in prairies times number of linked prairie tiles
+        colour: 90CC17
+        default: true
+      - name: Marshes
+        hint: crowns in marshes times number of linked marsh tiles
+        colour: C08B62
+        default: true
+      - name: Mountains
+        hint: crowns in mountains times number of linked mountain tiles
+        colour: 3A1828
+        default: true
+      - name: Towns
+        hint: crowns in twons times number of linked town tiles
+        colour: E42E24
+        default: false
+      - name: Territories
+        hint: points for buildings that has multipliers for number of separate territories
+        colour: E42E24
+        default: false
+      - name: Towers
+        hint: points for buildings that score towers
+        colour: E42E24
+        default: false
+      - name: Buildings
+        hint: points for buildings that are worth points
+        colour: E42E24
+        default: false
+
 

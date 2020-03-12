@@ -15,12 +15,48 @@ private const val TAG = "GameParser"
 class GamesParser(xmlconfig: InputStream) {
     // We don't use namespaces
     private val ns: String? = null
+
+    // Data class stores
+    data class Game(val name: String, val players: List<String>?, val tracks: List<Track>?)
+    data class Track(
+        val name: String,
+        val colour: String,
+        val default: Boolean,
+        val special: Special?
+    )
+
+    data class Special(val variables: List<String>, val calculation: String)
+
+    // Public access to the list of games
     var games: List<Game>
 
     init {
-        //val inputStream: InputStream = File("res/xml/games.xml").inputStream()
-        //games = parse(parser)
         games = parse(xmlconfig)
+    }
+
+    fun getGamesList(): List<String> {
+        val list = mutableListOf<String>()
+        for (game in games)
+            list.add(game.name)
+        return list
+    }
+
+    fun getPlayersList(gamename: String): List<String> {
+        for (game in games) {
+            if (game.name == gamename)
+                if (game.players != null)
+                    return game.players
+        }
+        return listOf("")
+    }
+
+    fun getTracksList(gamename: String?): List<Track>? {
+        if (gamename != null)
+            for (game in games) {
+                if (game.name == gamename)
+                    return game.tracks
+            }
+        return null
     }
 
     @Throws(XmlPullParserException::class, IOException::class)
@@ -52,17 +88,7 @@ class GamesParser(xmlconfig: InputStream) {
         return entries
     }
 
-    data class Special(val variables: List<String>, val calculation: String)
-    data class Track(
-        val name: String,
-        val colour: String,
-        val default: Boolean,
-        val special: Special?
-    )
-
-    data class Game(val name: String, val players: List<String>?, val tracks: List<Track>?)
-
-    // Parses the contents of an game.
+    // Parses the contents of an game
     @Throws(XmlPullParserException::class, IOException::class)
     private fun readGame(parser: XmlPullParser): Game {
         parser.require(XmlPullParser.START_TAG, ns, "games")
@@ -152,7 +178,7 @@ class GamesParser(xmlconfig: InputStream) {
         return result
     }
 
-    // For reading all the strings from the XML
+    // For reading all the booleans from the XML
     @Throws(IOException::class, XmlPullParserException::class)
     private fun readBoolean(parser: XmlPullParser): Boolean {
         var result = ""

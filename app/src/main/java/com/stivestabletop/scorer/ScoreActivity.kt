@@ -4,12 +4,15 @@ import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.text.Editable
+import android.text.InputFilter
+import android.text.InputFilter.LengthFilter
 import android.text.InputType
 import android.text.TextWatcher
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -18,6 +21,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.children
 import androidx.fragment.app.Fragment
+
 
 @RequiresApi(Build.VERSION_CODES.O)
 fun getContrastTextColour(bg: Int): Int {
@@ -76,7 +80,7 @@ class TrackFragment : Fragment() {
         return track
     }
 
-    // Player name view box
+    // Player score edit text
     @RequiresApi(Build.VERSION_CODES.KITKAT)
     fun getScoreView(id: Int, tag: String, editable: Boolean): View {
         val layoutparams = LinearLayout.LayoutParams(
@@ -90,9 +94,16 @@ class TrackFragment : Fragment() {
         view.textSize = 12f
         view.layoutParams = layoutparams
         if (editable) {
+            // Signed integer numbers only
             view.inputType = InputType.TYPE_CLASS_NUMBER or
                     InputType.TYPE_NUMBER_VARIATION_NORMAL or InputType.TYPE_NUMBER_FLAG_SIGNED
+            // Right aligned
             view.gravity = Gravity.END
+            // Move cursor onto next box to right on screen-keyboard enter and force no full screen
+            view.imeOptions = EditorInfo.IME_ACTION_NEXT or EditorInfo.IME_FLAG_NO_FULLSCREEN
+            view.maxLines = 1
+            // Set maximum input length (including sign)
+            view.filters = arrayOf<InputFilter>(LengthFilter(5))
 
             view.addTextChangedListener(object : TextWatcher {
                 override fun afterTextChanged(s: Editable) {}
@@ -106,57 +117,69 @@ class TrackFragment : Fragment() {
                     s: CharSequence, start: Int,
                     before: Int, count: Int
                 ) {
-                    // TODO: Do we have to re-calculate everything?
-                    // TODO: Does this have to be soo ugly...
-                    // TODO: Could be a function call that is called from here rather than duplicated!
-                    // Collect all the scores for all the players in all the tracks
-                    val scores = mutableMapOf<Int, Int>()
-                    val fragments = activity?.supportFragmentManager?.fragments
-                    if (fragments != null) {
-                        for (fragment in fragments) {
-                            if (fragment.id != R.id.total_track) {
-                                val view = fragment.view
-                                val layout = view?.findViewById<LinearLayout>(R.id.scoreLayout)
-                                val children = layout?.children
-                                if (children != null)
-                                    for (child in children) {
-                                        if (child is EditText) {
-                                            val text = child.text.toString()
-                                            var value: Int
-                                            try {
-                                                value = text.toInt()
-                                            } catch (e: NumberFormatException) {
-                                                // Blank or maybe a negative symbol
-                                                value = 0
-                                            }
-                                            if (scores.containsKey(child.id)) {
-                                                scores[child.id] = scores.getValue(child.id) + value
-                                            } else {
-                                                scores[child.id] = value
-                                            }
-                                        }
-                                    }
-                            }
-                        }
-                    }
-                    // Update the totals in the total track
-                    val track = activity?.findViewById<ConstraintLayout>(R.id.total_track)
-                    val layout = track?.findViewById<LinearLayout>(R.id.scoreLayout)
-                    val children = layout?.children
-                    if (children != null)
-                        for (child in children) {
-                            if (child is TextView) {
-                                child.text = scores[child.id].toString()
-                            }
-                        }
+                    calculateScores()
                 }
             })
         } else {
+            // Total text
             view.text = "0"
             view.height = 100
             view.gravity = Gravity.CENTER_HORIZONTAL or Gravity.END
         }
         return view
+    }
+
+    // Collect all the scores for all the players in all the tracks
+    // TODO: Do we have to re-calculate everything?
+    fun calculateScores() {
+        // Map of scores - key = player number, value = running total
+        val scores = mutableMapOf<Int, Int>()
+        // List of track fragments
+        val fragments = activity?.supportFragmentManager?.fragments
+        if (fragments != null) {
+            for (fragment in fragments) {
+                // Ignore the total track, update that later
+                if (fragment.id != R.id.total_track) {
+                    // Find the score layout in the fragment
+                    val view = fragment.view
+                    val layout = view?.findViewById<LinearLayout>(R.id.scoreLayout)
+                    val children = layout?.children
+                    if (children != null) {
+                        // Look at the edit text boxes in the fragment
+                        for (child in children) {
+                            if (child is EditText) {
+                                // Retrieve value and convert to number
+                                val text = child.text.toString()
+                                var value: Int
+                                try {
+                                    value = text.toInt()
+                                } catch (e: NumberFormatException) {
+                                    // Blank or maybe a negative symbol
+                                    value = 0
+                                }
+                                // Store number in score map based on player number
+                                if (scores.containsKey(child.id)) {
+                                    scores[child.id] = scores.getValue(child.id) + value
+                                } else {
+                                    scores[child.id] = value
+                                }
+                            }
+                        } // end for children
+                    }
+                }
+            } // end for fragments
+        }
+        // Update the totals in the total track
+        val track = activity?.findViewById<ConstraintLayout>(R.id.total_track)
+        val layout = track?.findViewById<LinearLayout>(R.id.scoreLayout)
+        val children = layout?.children
+        if (children != null) {
+            for (child in children) {
+                if (child is TextView) {
+                    child.text = scores[child.id].toString()
+                }
+            }
+        }
     }
 }
 
@@ -168,22 +191,28 @@ class ScoreActivity : AppCompatActivity() {
         setContentView(R.layout.activity_score)
 
         // Get the Intent that started this activity and extract the players
-        var playerlist = intent.getStringArrayListExtra(PLAYER_MESSAGE)
-        if (playerlist == null)
-            playerlist = ArrayList(listOf("fail"))
-        val players = playerlist.size
+        val bundle = intent.extras
+        var playernames = bundle?.getStringArrayList(PLAYER_NAMES)
+        if (playernames == null)
+            playernames = ArrayList(listOf("fail"))
+        var playertypes = bundle?.getStringArrayList(PLAYER_TYPES)
+        if (playertypes == null)
+            playertypes = ArrayList(listOf("fail"))
+        val players = playernames.size
 
         // Add the player names to the names list
         val view = findViewById<LinearLayout>(R.id.playersLayout)
-        for (message in playerlist)
-            view?.addView(getTitle(message))
+        for (player in 0..(players - 1)) {
+            val name = playernames[player] + "\n" + playertypes[player]
+            view?.addView(getTitle(name))
+        }
 
-        // TODO: Pass this info from main activity???
         val xmlconfig = resources.openRawResource(R.raw.games)
-        val games = GamesParser(xmlconfig)
+        // TODO: Is it worth passing this from main activity, rather than re-read?
+        val gamesconfig = GamesParser(xmlconfig)
 
-        // TODO: Don't hardcode game!
-        val tracks = games.games[0].tracks
+        var gamename = bundle?.getString(GAME_NAME)
+        val tracks = gamesconfig.getTracksList(gamename)
 
         if (savedInstanceState == null) {
             if (tracks != null) {
