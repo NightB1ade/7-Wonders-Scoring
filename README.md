@@ -1,12 +1,14 @@
 # 7-Wonders-Scoring
 
-## Version 6
+## Version 7
 
 * Simple app prototype with two games - 7 Wonders and King/Queendomino
 * First screen is game chooser and player name/type entry - list of players names built and shown
+* Players can be cleared via menu
 * Second screen is dynamic to number of players, and sets up score tracks based on chosen game
 * Tracks can be configured in second screen (hide/show)
 * Totals are tracked dynamically
+* Back button will take you back to player entry
 
 ## Next steps
 Current brain dump - also see TODOs in code
@@ -23,7 +25,9 @@ Current brain dump - also see TODOs in code
 - [x] player type chooser
 - [x] menu to configure tracks
 - [x] dialog to select and change visible tracks/score
-- [ ] sort out players when game changes!
-- [ ] allow removal of players on first screen?
+- [x] sort out players when game changes - dialog to ask if ok to clear.
+- [x] allow removal of players on first screen - by clearing menu
+- [x] back button takes you back to first screen
 - [ ] player name editing
-- [ ] menu to reset and return to main screen
+- [ ] add in science calculator (via reverse polish notation engine?)
+- [ ] dialog at end declaring winner on final score entry?

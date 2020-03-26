@@ -254,7 +254,7 @@ class ScoreActivity : AppCompatActivity() {
         val view = findViewById<LinearLayout>(R.id.playersLayout)
         for (player in 0 until players) {
             val name = playernames[player] + "\n" + playertypes[player]
-            view?.addView(getTitle(name))
+            view?.addView(getPlayerTitle(name))
         }
 
         val xmlconfig = resources.openRawResource(R.raw.games)
@@ -297,20 +297,31 @@ class ScoreActivity : AppCompatActivity() {
         return true
     }
 
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        // Handle item selection
+        return when (item.itemId) {
+            R.id.menu_config -> {
+                doConfigure()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
     fun doConfigure() {
         val data = supportFragmentManager.findFragmentByTag(TRACKS_LIST)
         if (data is TracksDataFragment) {
             // Simple multi-select dialog
             val actives = data.getActives()
             val builder = AlertDialog.Builder(this)
-            builder.setTitle("Choose score tracks")
+            builder.setTitle(R.string.score_conf)
             builder.setMultiChoiceItems(
                 data.getTrackNames(), actives
             ) { dialog, which, isChecked ->
                 actives[which] = isChecked
             }
             // TODO: Add cancel
-            builder.setPositiveButton("DONE") { dialog, id ->
+            builder.setPositiveButton(R.string.ok) { dialog, id ->
                 data.setActives(actives)
                 // Update tracks
                 val trans = supportFragmentManager.beginTransaction()
@@ -335,20 +346,9 @@ class ScoreActivity : AppCompatActivity() {
         }
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        // Handle item selection
-        return when (item.itemId) {
-            R.id.menu_config -> {
-                doConfigure()
-                true
-            }
-            else -> super.onOptionsItemSelected(item)
-        }
-    }
-
     // Player name view box
     @RequiresApi(Build.VERSION_CODES.KITKAT)
-    fun getTitle(string: String): TextView {
+    fun getPlayerTitle(string: String): TextView {
         val layoutparams = LinearLayout.LayoutParams(
             0,
             LinearLayout.LayoutParams.WRAP_CONTENT,

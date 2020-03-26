@@ -1,7 +1,13 @@
 package com.stivestabletop.scorer
 
+import android.app.AlertDialog
+import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.*
@@ -39,6 +45,28 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        // Read in games info
+        val xmlconfig = resources.openRawResource(R.raw.games)
+        val gamesconfig = GamesParser(xmlconfig)
+
+        if (savedInstanceState == null) {
+            // Create initial store of stuff
+            supportFragmentManager
+                .beginTransaction()
+                .add(R.id.rootLayout, PlayerDataFragment.newInstance(), PLAYER_LIST)
+                .commit()
+        }
+        val data = supportFragmentManager.findFragmentByTag(PLAYER_LIST)
+
+        // Set up player list from any saved fragment
+        if (savedInstanceState != null) {
+            // Re-use store of players to re-create view
+            val view = findViewById<LinearLayout>(R.id.rootLayout)
+            if (data is PlayerDataFragment)
+                for ((idx, name) in data.playernames.withIndex())
+                    view?.addView(getPlayerText(name, data.playertypes[idx]))
+        }
+
         // Add listener to perform add player on screen-keyboard enter
         findViewById<EditText>(R.id.editPlayer).setOnEditorActionListener { v, actionId, _ ->
             return@setOnEditorActionListener when (actionId) {
@@ -50,10 +78,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        // Read in games info
-        val xmlconfig = resources.openRawResource(R.raw.games)
-        val gamesconfig = GamesParser(xmlconfig)
-
         // Set up games spinner
         val view = findViewById<Spinner>(R.id.spinnerGame)
         val adapter = ArrayAdapter(
@@ -61,30 +85,61 @@ class MainActivity : AppCompatActivity() {
             gamesconfig.getGamesList()
         )
         view.adapter = adapter
+        if (data is PlayerDataFragment && !data.gamename.isBlank()) {
+            // Set up chosen game
+            view.setSelection(adapter.getPosition(data.gamename))
+            setupPlayerSpinner(applicationContext, gamesconfig.getPlayersList(data.gamename))
+        }
 
         // Set up listener for game change
         view.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
                 parent: AdapterView<*>,
-                view: View,
-                position: Int,
+                v: View?,
+                pos: Int,
                 id: Long
             ) {
-                val gamename = parent.getItemAtPosition(position).toString()
+                val gamename = parent.getItemAtPosition(pos).toString()
                 val data = supportFragmentManager.findFragmentByTag(PLAYER_LIST)
-                if (data is PlayerDataFragment)
-                    if (data.gamename != gamename) {
+                if (data is PlayerDataFragment) {
+                    if (data.gamename.isBlank()) {
+                        // Initialization
                         data.gamename = gamename
-                        // TODO: Clear out players chosen on change of game!
+                        setupPlayerSpinner(parent.context, gamesconfig.getPlayersList(gamename))
+                    } else {
+                        if (data.gamename != gamename) {
+                            if (data.playernames.size > 0) {
+                                val builder = AlertDialog.Builder(parent.context)
+                                builder.apply {
+                                    setPositiveButton(R.string.ok,
+                                        DialogInterface.OnClickListener { dialog, id ->
+                                            data.gamename = gamename
+                                            clearPlayers()
+                                            setupPlayerSpinner(
+                                                parent.context,
+                                                gamesconfig.getPlayersList(gamename)
+                                            )
+                                        })
+                                    setNegativeButton(R.string.cancel,
+                                        DialogInterface.OnClickListener { dialog, id ->
+                                            // Reset selection
+                                            view.setSelection(adapter.getPosition(data.gamename))
+                                        })
+                                    setMessage(R.string.game_change)
+                                }
+                                // Create the AlertDialog
+                                builder.create()
+                                builder.show()
+                            } else {
+                                data.gamename = gamename
+                                setupPlayerSpinner(
+                                    parent.context,
+                                    gamesconfig.getPlayersList(gamename)
+                                )
+                            }
+                        }
                     }
-                // Set up players spinner
-                val view = findViewById<Spinner>(R.id.spinnerPlayer)
-                val adapter = ArrayAdapter(
-                    parent.context,
-                    R.layout.support_simple_spinner_dropdown_item,
-                    gamesconfig.getPlayersList(gamename)
-                )
-                view.adapter = adapter
+                }
             }
 
             override fun onNothingSelected(parent: AdapterView<*>) {
@@ -92,27 +147,55 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        // Set up player list from any saved fragment
-        val data = supportFragmentManager.findFragmentByTag(PLAYER_LIST)
-        if (savedInstanceState == null) {
-            // Create initial store of stuff
-            supportFragmentManager
-                .beginTransaction()
-                .add(R.id.rootLayout, PlayerDataFragment.newInstance(), PLAYER_LIST)
-                .commit()
-        } else {
-            // Re-use store of players to re-create view
-            val view = findViewById<LinearLayout>(R.id.rootLayout)
-            if (data is PlayerDataFragment)
-                for (message in data.playernames)
-                    view?.addView(getText(message))
-        }
         // Set the next player text based on the number of players so far
         var numPlayers = 0
         if (data is PlayerDataFragment)
             numPlayers = data.playernames.size
         setNextPlayer(numPlayers)
         enableDone()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        val inflater: MenuInflater = menuInflater
+        // Not sure why this is an error in IDE but it compiles and works!
+        inflater.inflate(R.menu.menu_main, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        // Handle item selection
+        return when (item.itemId) {
+            R.id.menu_clear -> {
+                clearPlayers()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    // Set up the player type list
+    fun setupPlayerSpinner(context: Context, list: List<String>) {
+        // Set up players spinner
+        val view = findViewById<Spinner>(R.id.spinnerPlayer)
+        val adapter = ArrayAdapter(
+            context,
+            R.layout.support_simple_spinner_dropdown_item,
+            list
+        )
+        view.adapter = adapter
+    }
+
+    // Clear all the listed players
+    fun clearPlayers() {
+        val data = supportFragmentManager.findFragmentByTag(PLAYER_LIST)
+        if (data is PlayerDataFragment) {
+            data.playernames = mutableListOf<String>()
+            data.playertypes = mutableListOf<String>()
+            setNextPlayer(0)
+            enableDone()
+            val view = findViewById<LinearLayout>(R.id.rootLayout)
+            view.removeAllViewsInLayout()
+        }
     }
 
     // Set up the next player text based on the number of players so far
@@ -125,11 +208,12 @@ class MainActivity : AppCompatActivity() {
         spinner.setSelection(0)
     }
 
-    // Simple textview box
-    fun getText(string: String): TextView {
+    // Get a simple player name/type textview box
+    fun getPlayerText(name: String, type: String): TextView {
+        val text = if (type.isBlank()) name else "$name is $type"
         val tv_dynamic = TextView(this)
         tv_dynamic.textSize = 20f
-        tv_dynamic.text = string
+        tv_dynamic.text = text
         return tv_dynamic
     }
 
@@ -146,7 +230,7 @@ class MainActivity : AppCompatActivity() {
         doneButton.isEnabled = false
     }
 
-    // Add a player to the list
+    // Add a new player to the list
     fun addPlayer(view: View) {
         val editText = findViewById<EditText>(R.id.editPlayer)
         val playername = editText.text.toString()
@@ -164,9 +248,8 @@ class MainActivity : AppCompatActivity() {
             data.playertypes.add(playertype)
             setNextPlayer(data.playernames.size)
         }
-        // add new text to layout
-        val text = if (playertype.isBlank()) playername else "$playername is $playertype"
-        view?.addView(getText(text))
+        // add player to layout
+        view?.addView(getPlayerText(playername, playertype))
         // Enable done if we have enough players
         enableDone()
     }
