@@ -13,19 +13,20 @@ private const val TAG = "GameParser"
 // https://developer.android.com/training/basics/network-ops/xml#kotlin
 
 class GamesParser(xmlconfig: InputStream) {
-    // We don't use namespaces
+    // We don't use namespaces in xml
     private val ns: String? = null
 
-    // Data class stores
+    // Data class stores - matching dictionaries in XML
     data class Game(val name: String, val players: List<String>?, val tracks: List<Track>?)
     data class Track(
         val name: String,
         val colour: String,
         val default: Boolean,
+        val hint: String,
         val special: Special?
     )
 
-    data class Special(val variables: List<String>, val calculation: String)
+    data class Special(val variables: List<String>, val calculation: String, val multiple: String)
 
     // Public access to the list of games
     var games: List<Game>
@@ -59,6 +60,7 @@ class GamesParser(xmlconfig: InputStream) {
         return null
     }
 
+    @Suppress("NAME_SHADOWING")
     @Throws(XmlPullParserException::class, IOException::class)
     private fun parse(inputStream: InputStream): List<Game> {
         inputStream.use { inputStream ->
@@ -106,6 +108,8 @@ class GamesParser(xmlconfig: InputStream) {
                 else -> skip(parser)
             }
         }
+        if (name.isBlank())
+            Log.e(TAG, "Missing name on a game")
         return Game(name, players, tracks)
     }
 
@@ -131,6 +135,7 @@ class GamesParser(xmlconfig: InputStream) {
         var name = ""
         var colour = "FFFFFF"
         var default = false
+        var hint = ""   // Optional
         var special: Special? = null
         while (parser.next() != XmlPullParser.END_TAG) {
             if (parser.eventType != XmlPullParser.START_TAG) {
@@ -140,11 +145,14 @@ class GamesParser(xmlconfig: InputStream) {
                 "name" -> name = readName(parser)
                 "colour" -> colour = readColour(parser)
                 "default" -> default = readDefault(parser)
-                // TODO: Add reading of speical!
+                "hint" -> hint = readHint(parser)
+                "special" -> special = readSpecial(parser)
                 else -> skip(parser)
             }
         }
-        return Track(name, colour, default, special)
+        if (name.isBlank())
+            Log.e(TAG, "Missing name on a track")
+        return Track(name, colour, default, hint, special)
     }
 
     @Throws(IOException::class, XmlPullParserException::class)
@@ -152,7 +160,7 @@ class GamesParser(xmlconfig: InputStream) {
         parser.require(XmlPullParser.START_TAG, ns, "colour")
         var result = readText(parser)
         if (result.length != 6) {
-            Log.w(TAG, "Ignoring colour '$result'")
+            Log.w(TAG, "Ignoring invalid colour '$result'")
             result = "FF00FF"
         }
         parser.require(XmlPullParser.END_TAG, ns, "colour")
@@ -164,6 +172,72 @@ class GamesParser(xmlconfig: InputStream) {
         parser.require(XmlPullParser.START_TAG, ns, "default")
         val result = readBoolean(parser)
         parser.require(XmlPullParser.END_TAG, ns, "default")
+        return result
+    }
+
+    @Throws(IOException::class, XmlPullParserException::class)
+    private fun readHint(parser: XmlPullParser): String {
+        parser.require(XmlPullParser.START_TAG, ns, "hint")
+        val result = readText(parser)
+        parser.require(XmlPullParser.END_TAG, ns, "hint")
+        return result
+    }
+
+    @Throws(XmlPullParserException::class, IOException::class)
+    private fun readSpecial(parser: XmlPullParser): Special {
+        parser.require(XmlPullParser.START_TAG, ns, "special")
+        var calculation = ""
+        var multiple = ""   // Optional
+        val variables = mutableListOf<String>()
+        while (parser.next() != XmlPullParser.END_TAG) {
+            if (parser.eventType != XmlPullParser.START_TAG) {
+                continue
+            }
+            when (parser.name) {
+                "calculation" -> calculation = readCalculation(parser)
+                "multiple" -> multiple = readMultiple(parser)
+                "variables" -> variables.add(readVariables(parser))
+                else -> skip(parser)
+            }
+        }
+        if (variables.size == 0)
+            Log.e(TAG, "No variables specified for special calculation: $calculation")
+        return Special(variables, calculation, multiple)
+    }
+
+    @Throws(IOException::class, XmlPullParserException::class)
+    private fun readCalculation(parser: XmlPullParser): String {
+        parser.require(XmlPullParser.START_TAG, ns, "calculation")
+        val result = readText(parser)
+        // Very simple check for invalid chars
+        var ok: Boolean
+        for (char in result.asSequence()) {
+            when (char) {
+                in '0'..'9' -> ok = true
+                in 'A'..'Z' -> ok = true
+                in "+-*/nx" -> ok = true
+                else -> ok = false
+            }
+            if (!ok)
+                Log.e(TAG, "Found invalid character '$char' in calculation: $result")
+        }
+        parser.require(XmlPullParser.END_TAG, ns, "calculation")
+        return result
+    }
+
+    @Throws(IOException::class, XmlPullParserException::class)
+    private fun readMultiple(parser: XmlPullParser): String {
+        parser.require(XmlPullParser.START_TAG, ns, "multiple")
+        val result = readText(parser)
+        parser.require(XmlPullParser.END_TAG, ns, "multiple")
+        return result
+    }
+
+    @Throws(IOException::class, XmlPullParserException::class)
+    private fun readVariables(parser: XmlPullParser): String {
+        parser.require(XmlPullParser.START_TAG, ns, "variables")
+        val result = readText(parser)
+        parser.require(XmlPullParser.END_TAG, ns, "variables")
         return result
     }
 

@@ -33,6 +33,10 @@
             <hint>1 point for every three coins</hint>
             <colour>9B7A19</colour>
             <default>true</default>
+            <special>
+                <variables>Coins</variables>
+                <calculation>A3/</calculation>
+            </special>
         </tracks>
         <tracks>
             <name>Wonder</name>
@@ -92,12 +96,22 @@
             <hint>1 point for every three coins</hint>
             <colour>996600</colour>
             <default>false</default>
+            <special>
+                <variables>Coins</variables>
+                <calculation>A3/</calculation>
+            </special>
         </tracks>
         <tracks>
             <name>Fields</name>
             <hint>crowns in fields times number of linked field tiles</hint>
             <colour>FDDC29</colour>
             <default>true</default>
+            <special>
+                <variables>Tiles</variables>
+                <variables>Crowns</variables>
+                <calculation>AB*</calculation>
+                <multiple>+</multiple>
+            </special>
         </tracks>
         <tracks>
             <name>Forests</name>

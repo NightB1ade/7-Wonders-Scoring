@@ -100,7 +100,8 @@ class MainActivity : AppCompatActivity() {
                 id: Long
             ) {
                 val gamename = parent.getItemAtPosition(pos).toString()
-                val data = supportFragmentManager.findFragmentByTag(PLAYER_LIST)
+                @Suppress("NAME_SHADOWING") val data =
+                    supportFragmentManager.findFragmentByTag(PLAYER_LIST)
                 if (data is PlayerDataFragment) {
                     if (data.gamename.isBlank()) {
                         // Initialization
@@ -111,8 +112,9 @@ class MainActivity : AppCompatActivity() {
                             if (data.playernames.size > 0) {
                                 val builder = AlertDialog.Builder(parent.context)
                                 builder.apply {
-                                    setPositiveButton(R.string.ok,
-                                        DialogInterface.OnClickListener { dialog, id ->
+                                    setPositiveButton(
+                                        android.R.string.ok,
+                                        DialogInterface.OnClickListener { _, _ ->
                                             data.gamename = gamename
                                             clearPlayers()
                                             setupPlayerSpinner(
@@ -120,8 +122,9 @@ class MainActivity : AppCompatActivity() {
                                                 gamesconfig.getPlayersList(gamename)
                                             )
                                         })
-                                    setNegativeButton(R.string.cancel,
-                                        DialogInterface.OnClickListener { dialog, id ->
+                                    setNegativeButton(
+                                        android.R.string.cancel,
+                                        DialogInterface.OnClickListener { _, _ ->
                                             // Reset selection
                                             view.setSelection(adapter.getPosition(data.gamename))
                                         })
@@ -231,7 +234,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     // Add a new player to the list
-    fun addPlayer(view: View) {
+    @Suppress("UNUSED_PARAMETER")
+    fun addPlayer(v: View) {
         val editText = findViewById<EditText>(R.id.editPlayer)
         val playername = editText.text.toString()
         val spinner = findViewById<Spinner>(R.id.spinnerPlayer)
@@ -255,7 +259,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     // Finished entering players - move onto scoring
-    fun donePlayers(view: View) {
+    @Suppress("UNUSED_PARAMETER")
+    fun donePlayers(v: View) {
         val data = supportFragmentManager.findFragmentByTag(PLAYER_LIST)
         if (data is PlayerDataFragment) {
             val args = Bundle()

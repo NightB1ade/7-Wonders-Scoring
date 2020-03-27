@@ -1,6 +1,7 @@
 package com.stivestabletop.scorer
 
 import android.app.AlertDialog
+import android.content.DialogInterface
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
@@ -11,6 +12,7 @@ import android.text.InputType
 import android.text.TextWatcher
 import android.view.*
 import android.view.inputmethod.EditorInfo
+import android.widget.Button
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -32,12 +34,16 @@ fun getContrastTextColour(bg: Int): Int {
 
 class TrackFragment : Fragment() {
     companion object {
-        fun newInstance(players: Int, name: String, colour: String, total: Boolean): TrackFragment {
+        fun newInstance(
+            players: Array<String>, name: String, colour: String,
+            first: Boolean, total: Boolean
+        ): TrackFragment {
             val f = TrackFragment()
             val args = Bundle()
-            args.putInt("players", players)
+            args.putStringArray("players", players)
             args.putString("name", name)
             args.putString("colour", colour)
+            args.putBoolean("first", first) // First visible track to get focus
             args.putBoolean("total", total)
             f.setArguments(args)
             return f
@@ -51,14 +57,16 @@ class TrackFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val args = arguments
-        var players = 0
+        var players: Array<String> = arrayOf()
         var tname = ""
         var tcol = ""
+        var first = false
         var total = false
         if (args != null) {
-            players = args.getInt("players", 0)
+            players = args.getStringArray("players") as Array<String>
             tname = args.getString("name", "track")
             tcol = "#" + args.getString("colour", "FFFFFF")
+            first = args.getBoolean("first", false)
             total = args.getBoolean("total", false)
         }
         // Create new track fragment
@@ -66,16 +74,25 @@ class TrackFragment : Fragment() {
         if (total)
             track.id = R.id.total_track
         // Update the track name/colour
-        val name = track.findViewById<TextView>(R.id.trackName)
-        name.setText(tname)
+        val name = track.findViewById<Button>(R.id.trackName)
+        name.text = tname
         val bgcol = Color.parseColor(tcol)
         name.setBackgroundColor(bgcol)
         name.setTextColor(getContrastTextColour(bgcol))
+        name.setOnClickListener(View.OnClickListener { v ->
+            // TODO: Do something more useful here... with special calcs
+            if (v is Button)
+                v.text = "Woot"
+        })
 
         // Sort out score boxes
         val view = track.findViewById<LinearLayout>(R.id.scoreLayout)
-        for (num in 1..players)
-            view?.addView(getScoreView(num, tname, !total))
+        for (num in 1..players.size) {
+            val sv = getScoreView(num, tname, players[num - 1], !total)
+            view?.addView(sv)
+            if (num == 1 && first)
+                sv.requestFocus()
+        }
 
         return track
     }
@@ -86,30 +103,54 @@ class TrackFragment : Fragment() {
         calculateScores()
     }
 
+    fun getScoreEntry(): EditText {
+        val view = EditText(requireContext())
+        // Signed integer numbers only
+        view.inputType = InputType.TYPE_CLASS_NUMBER or
+                InputType.TYPE_NUMBER_VARIATION_NORMAL or InputType.TYPE_NUMBER_FLAG_SIGNED
+        // Right aligned
+        view.gravity = Gravity.END
+        // Move cursor onto next box to right on screen-keyboard enter and force no full screen
+        view.imeOptions = EditorInfo.IME_ACTION_NEXT or EditorInfo.IME_FLAG_NO_FULLSCREEN
+        view.maxLines = 1
+        // Set maximum input length (including sign)
+        view.filters = arrayOf<InputFilter>(LengthFilter(5))
+        return view
+    }
+
     // Player score edit text
     @RequiresApi(Build.VERSION_CODES.KITKAT)
-    fun getScoreView(id: Int, tag: String, editable: Boolean): View {
+    fun getScoreView(id: Int, trackname: String, playername: String, editable: Boolean): View {
         val layoutparams = LinearLayout.LayoutParams(
             0,
             LinearLayout.LayoutParams.WRAP_CONTENT,
             1.0f
         )
-        val view = if (editable) EditText(requireContext()) else TextView(requireContext())
+        val view = if (editable) getScoreEntry() else TextView(requireContext())
         view.id = id
-        view.tag = tag
+        view.tag = trackname
         view.textSize = 12f
         view.layoutParams = layoutparams
         if (editable) {
-            // Signed integer numbers only
-            view.inputType = InputType.TYPE_CLASS_NUMBER or
-                    InputType.TYPE_NUMBER_VARIATION_NORMAL or InputType.TYPE_NUMBER_FLAG_SIGNED
-            // Right aligned
-            view.gravity = Gravity.END
-            // Move cursor onto next box to right on screen-keyboard enter and force no full screen
-            view.imeOptions = EditorInfo.IME_ACTION_NEXT or EditorInfo.IME_FLAG_NO_FULLSCREEN
-            view.maxLines = 1
-            // Set maximum input length (including sign)
-            view.filters = arrayOf<InputFilter>(LengthFilter(5))
+            view.setOnLongClickListener(View.OnLongClickListener { v ->
+                val builder = AlertDialog.Builder(v.context)
+                builder.apply {
+                    setTitle(playername)
+                    setMessage("Enter $trackname score...")
+                    val entry = getScoreEntry()
+                    setView(entry)
+                    setPositiveButton(android.R.string.ok,
+                        DialogInterface.OnClickListener { _, _ ->
+                            if (v is EditText)
+                                v.setText(entry.text)
+                        })
+                    setNegativeButton(android.R.string.cancel, null)
+                }
+                // Create the AlertDialog
+                builder.create()
+                builder.show()
+                true
+            })
 
             view.addTextChangedListener(object : TextWatcher {
                 override fun afterTextChanged(s: Editable) {}
@@ -161,7 +202,7 @@ class TrackFragment : Fragment() {
                                     value = try {
                                         text.toInt()
                                     } catch (e: NumberFormatException) {
-                                        // Blank or maybe a negative symbol
+                                        // Blank or a negative symbol without number
                                         0
                                     }
                                     // Store number in score map based on player number
@@ -248,11 +289,11 @@ class ScoreActivity : AppCompatActivity() {
         var playertypes = bundle?.getStringArrayList(PLAYER_TYPES)
         if (playertypes == null)
             playertypes = ArrayList(listOf("fail"))
-        val players = playernames.size
+        val numplayers = playernames.size
 
         // Add the player names to the names list
         val view = findViewById<LinearLayout>(R.id.playersLayout)
-        for (player in 0 until players) {
+        for (player in 0 until numplayers) {
             val name = playernames[player] + "\n" + playertypes[player]
             view?.addView(getPlayerTitle(name))
         }
@@ -261,7 +302,7 @@ class ScoreActivity : AppCompatActivity() {
         // TODO: Is it worth passing this from main activity, rather than re-read?
         val gamesconfig = GamesParser(xmlconfig)
 
-        var gamename = bundle?.getString(GAME_NAME)
+        val gamename = bundle?.getString(GAME_NAME)
         val tracks = gamesconfig.getTracksList(gamename)
 
         if (savedInstanceState == null) {
@@ -273,17 +314,30 @@ class ScoreActivity : AppCompatActivity() {
 
                 // Save the tracks and players for later in the data fragment
                 frag.setTracks(tracks as MutableList<GamesParser.Track>)
-                frag.players = players
+                frag.players = numplayers
 
                 // Set up initial tracks
                 val trans = supportFragmentManager.beginTransaction()
+                var first = true
                 for (track in tracks) {
-                    val tf = TrackFragment.newInstance(players, track.name, track.colour, false)
+                    val tf = TrackFragment.newInstance(
+                        playernames.toTypedArray(), track.name, track.colour,
+                        (first && track.default), false
+                    )
                     trans.add(R.id.trackLayout, tf)
-                    if (!track.default)
+                    if (!track.default) {
                         trans.hide(tf)
+                    } else {
+                        first = false
+                    }
                 }
-                val tf = TrackFragment.newInstance(players, "Total", "000000", true)
+                val tf = TrackFragment.newInstance(
+                    playernames.toTypedArray(),
+                    "Total",
+                    "000000",
+                    false,
+                    true
+                )
                 trans.add(R.id.trackLayout, tf)
                 trans.commit()
             }
@@ -317,11 +371,11 @@ class ScoreActivity : AppCompatActivity() {
             builder.setTitle(R.string.score_conf)
             builder.setMultiChoiceItems(
                 data.getTrackNames(), actives
-            ) { dialog, which, isChecked ->
+            ) { _, which, isChecked ->
                 actives[which] = isChecked
             }
-            // TODO: Add cancel
-            builder.setPositiveButton(R.string.ok) { dialog, id ->
+            // TODO: Add cancel?
+            builder.setPositiveButton(android.R.string.ok) { _, _ ->
                 data.setActives(actives)
                 // Update tracks
                 val trans = supportFragmentManager.beginTransaction()

@@ -33,6 +33,11 @@ games:
         hint: 1 point for every three coins
         colour: 9B7A19
         default: true
+        special:
+          variables:
+            - Coins
+          # Extra Reverse Polish Notation of: A / 3
+          calculation: A3/
       - name: Wonder
         colour: F5B463
         default: true
@@ -47,7 +52,7 @@ games:
             - Compasses
             - Tablets
             - Cogs
-          # Reverse Polish Notation of: A*A + B*B + C*C + min(A,min(B,C))*7
+          # Extra Reverse Polish Notation of: A*A + B*B + C*C + min(A,min(B,C))*7
           calculation: AA*BB*+CC*+BCnAn7*+
       - name: Commercial
         colour: FFEB29
@@ -77,10 +82,23 @@ games:
         hint: 1 point for every three coins
         colour: 996600
         default: false
+        special:
+          variables:
+            - Coins
+          # Extra Reverse Polish Notation of: A / 3
+          calculation: A3/
       - name: Fields
         hint: crowns in fields times number of linked field tiles
         colour: FDDC29
         default: true
+        special:
+          variables:
+            - Tiles
+            - Crowns
+          # Extra Reverse Polish Notation of: A*B
+          calculation: AB*
+          # Ask multiple times and add the result together
+          multiple: +
       - name: Forests
         hint: crowns in forests times number of linked forest tiles
         colour: 3D7C36

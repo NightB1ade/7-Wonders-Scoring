@@ -83,10 +83,11 @@
             android:layout_weight="0.5"
             android:ems="10"
             android:hint="@string/edit_message"
-            android:imeOptions="actionSend"
+            android:imeOptions="flagNoFullscreen|actionNext"
             android:importantForAutofill="no"
             android:inputType="textPersonName"
             android:maxLength="10"
+            android:maxLines="1"
             android:selectAllOnFocus="true"
             android:textIsSelectable="true" />
 

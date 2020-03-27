@@ -1,13 +1,11 @@
 <resources>
-    <string name="app_name">Test Scorer</string>
+    <string name="app_name">BGG Scorer</string>
     <string name="edit_message">Enter next players name</string>
     <string name="button_next">Next</string>
     <string name="button_done">Done</string>
     <string name="menu_config">Configure</string>
-    <string name="ok">Ok</string>
-    <string name="cancel">Cancel</string>
     <string name="score_conf">Choose score tracks</string>
     <string name="game_change">Changing game will clear the players. Are you sure?</string>
     <string name="menu_reset">Clear players</string>
-    <string name="version">proto_v7</string>
+    <string name="version">proto_v8</string>
 </resources>
