@@ -1,6 +1,7 @@
 package com.stivestabletop.scorer
 
 import android.app.AlertDialog
+import android.content.Context
 import android.content.DialogInterface
 import android.graphics.Color
 import android.os.Build
@@ -24,6 +25,12 @@ import androidx.fragment.app.Fragment
 
 const val TRACKS_LIST = "trackslist"
 
+val LAYOUT_PARAMS = LinearLayout.LayoutParams(
+    0,
+    LinearLayout.LayoutParams.WRAP_CONTENT,
+    1.0f
+)
+
 @RequiresApi(Build.VERSION_CODES.O)
 fun getContrastTextColour(bg: Int): Int {
     // Calculate the perceptive luminance (aka luma) - human eye favors green color...
@@ -36,7 +43,7 @@ class TrackFragment : Fragment() {
     companion object {
         fun newInstance(
             players: Array<String>, name: String, colour: String,
-            first: Boolean, total: Boolean
+            special: GamesParser.Special?, first: Boolean, total: Boolean
         ): TrackFragment {
             val f = TrackFragment()
             val args = Bundle()
@@ -45,6 +52,11 @@ class TrackFragment : Fragment() {
             args.putString("colour", colour)
             args.putBoolean("first", first) // First visible track to get focus
             args.putBoolean("total", total)
+            if (special != null) {
+                args.putString("calculation", special.calculation)
+                args.putStringArray("variables", special.variables.toTypedArray())
+                args.putString("multiple", special.multiple)
+            }
             f.setArguments(args)
             return f
         }
@@ -58,40 +70,66 @@ class TrackFragment : Fragment() {
     ): View? {
         val args = arguments
         var players: Array<String> = arrayOf()
-        var tname = ""
+        var name = ""
         var tcol = ""
         var first = false
         var total = false
+        var calculation = ""
+        var variables: Array<String> = arrayOf()
+        var multiple = ""
         if (args != null) {
             players = args.getStringArray("players") as Array<String>
-            tname = args.getString("name", "track")
+            name = args.getString("name", "track")
             tcol = "#" + args.getString("colour", "FFFFFF")
             first = args.getBoolean("first", false)
             total = args.getBoolean("total", false)
+            calculation = args.getString("calculation", "")
+            if (args.containsKey("variables"))
+                variables = args.getStringArray("variables") as Array<String>
+            multiple = ""
         }
         // Create new track fragment
         val track = inflater.inflate(R.layout.fragment_line, container, false)
         if (total)
             track.id = R.id.total_track
-        // Update the track name/colour
-        val name = track.findViewById<Button>(R.id.trackName)
-        name.text = tname
-        val bgcol = Color.parseColor(tcol)
-        name.setBackgroundColor(bgcol)
-        name.setTextColor(getContrastTextColour(bgcol))
-        name.setOnClickListener(View.OnClickListener { v ->
-            // TODO: Do something more useful here... with special calcs
-            if (v is Button)
-                v.text = "Woot"
-        })
 
         // Sort out score boxes
-        val view = track.findViewById<LinearLayout>(R.id.scoreLayout)
+        val layoutview = track.findViewById<LinearLayout>(R.id.scoreLayout)
         for (num in 1..players.size) {
-            val sv = getScoreView(num, tname, players[num - 1], !total)
-            view?.addView(sv)
+            val sv =
+                getScoreView(
+                    requireContext(),
+                    num,
+                    name,
+                    players[num - 1],
+                    calculation,
+                    variables,
+                    multiple,
+                    !total
+                )
+            layoutview?.addView(sv)
             if (num == 1 && first)
                 sv.requestFocus()
+        }
+
+        // Update the track name/colour
+        val nameview = track.findViewById<Button>(R.id.trackName)
+        nameview.text = name
+        val bgcol = Color.parseColor(tcol)
+        nameview.setBackgroundColor(bgcol)
+        nameview.setTextColor(getContrastTextColour(bgcol))
+        if (!total) {
+            nameview.setOnClickListener(View.OnClickListener { v ->
+                if (v is Button) {
+                    // Show the dialogs for this score track, one player at a time
+                    for (num in players.size downTo 1) {
+                        // TODO: Currently this displays ALL the dialogs on top of each other
+                        // find out how to do a chain of dialogs (that can be broken by cancel!)
+                        val ev = layoutview.findViewById<EditText>(num)
+                        specialDialog(ev, players[num - 1], name, calculation, variables, multiple)
+                    }
+                }
+            })
         }
 
         return track
@@ -99,12 +137,13 @@ class TrackFragment : Fragment() {
 
     override fun onHiddenChanged(hidden: Boolean) {
         super.onHiddenChanged(hidden)
-        // TODO - do this for every hide?
+        // TODO - do this for every track that gets hidden?
         calculateScores()
     }
 
-    fun getScoreEntry(): EditText {
-        val view = EditText(requireContext())
+    // Entry edit text for dialogs or track
+    fun getScoreEntry(context: Context): EditText {
+        val view = EditText(context)
         // Signed integer numbers only
         view.inputType = InputType.TYPE_CLASS_NUMBER or
                 InputType.TYPE_NUMBER_VARIATION_NORMAL or InputType.TYPE_NUMBER_FLAG_SIGNED
@@ -118,37 +157,27 @@ class TrackFragment : Fragment() {
         return view
     }
 
-    // Player score edit text
+    // Player score view - either edit text or total text view
     @RequiresApi(Build.VERSION_CODES.KITKAT)
-    fun getScoreView(id: Int, trackname: String, playername: String, editable: Boolean): View {
-        val layoutparams = LinearLayout.LayoutParams(
-            0,
-            LinearLayout.LayoutParams.WRAP_CONTENT,
-            1.0f
-        )
-        val view = if (editable) getScoreEntry() else TextView(requireContext())
+    fun getScoreView(
+        context: Context,
+        id: Int,
+        trackname: String,
+        playername: String,
+        calculation: String,
+        variables: Array<String>,
+        multiple: String,
+        editable: Boolean
+    ): View {
+        val view = if (editable) getScoreEntry(context) else TextView(context)
         view.id = id
         view.tag = trackname
         view.textSize = 12f
-        view.layoutParams = layoutparams
+        view.layoutParams = LAYOUT_PARAMS
         if (editable) {
             view.setOnLongClickListener(View.OnLongClickListener { v ->
-                val builder = AlertDialog.Builder(v.context)
-                builder.apply {
-                    setTitle(playername)
-                    setMessage("Enter $trackname score...")
-                    val entry = getScoreEntry()
-                    setView(entry)
-                    setPositiveButton(android.R.string.ok,
-                        DialogInterface.OnClickListener { _, _ ->
-                            if (v is EditText)
-                                v.setText(entry.text)
-                        })
-                    setNegativeButton(android.R.string.cancel, null)
-                }
-                // Create the AlertDialog
-                builder.create()
-                builder.show()
+                if (v is EditText)
+                    specialDialog(v, playername, trackname, calculation, variables, multiple)
                 true
             })
 
@@ -174,6 +203,117 @@ class TrackFragment : Fragment() {
             view.gravity = Gravity.CENTER_HORIZONTAL or Gravity.END
         }
         return view
+    }
+
+    fun specialDialog(
+        scoreview: EditText,
+        playername: String,
+        trackname: String,
+        calculation: String,
+        variables: Array<String>,
+        multiple: String
+    ) {
+        val builder = AlertDialog.Builder(scoreview.context)
+        builder.setTitle(playername)
+
+        // Set up layout for entry
+        val layout = LinearLayout(scoreview.context)
+        // TODO: Make this dialog prettier!
+        layout.setPadding(8, 0, 8, 0)
+
+        if (variables.size > 0) {
+            // Create special dialog
+            // TODO: Do something about multiple???
+            layout.orientation = LinearLayout.VERTICAL
+
+            // Sum
+            val laysum = LinearLayout(scoreview.context)
+            laysum.orientation = LinearLayout.HORIZONTAL
+            val sumtext = TextView(scoreview.context)
+            sumtext.layoutParams = LAYOUT_PARAMS
+            sumtext.text = "$trackname score:"
+            laysum.addView(sumtext)
+            val sum = TextView(scoreview.context)
+            sum.layoutParams = LAYOUT_PARAMS
+            sum.text = "0"
+            laysum.addView(sum)
+            // Created - but don't add it to layout yet
+
+            // Variables & calculator
+            val calculator = SpecialCalc(calculation)
+            for ((idx, name) in variables.withIndex()) {
+                val lay = LinearLayout(scoreview.context)
+                lay.orientation = LinearLayout.HORIZONTAL
+                val text = TextView(scoreview.context)
+                text.layoutParams = LAYOUT_PARAMS
+                text.text = "$name:"
+                lay.addView(text)
+                val entry = getScoreEntry(scoreview.context)
+                entry.layoutParams = LAYOUT_PARAMS
+                // Set an incremental id from 0 for each variable
+                entry.id = idx
+                entry.addTextChangedListener(object : TextWatcher {
+                    override fun afterTextChanged(s: Editable) {}
+                    override fun beforeTextChanged(
+                        s: CharSequence, start: Int,
+                        count: Int, after: Int
+                    ) {
+                    }
+
+                    override fun onTextChanged(
+                        s: CharSequence, start: Int,
+                        before: Int, count: Int
+                    ) {
+                        // Look for all the other variables in this layout
+                        val vars = mutableListOf<Int>()
+                        for (id in variables.indices) {
+                            val ev = layout.findViewById<EditText>(id)
+                            val textentry = ev.text.toString()
+                            val value = try {
+                                textentry.toInt()
+                            } catch (e: NumberFormatException) {
+                                // Blank or a negative symbol without number
+                                0
+                            }
+                            vars.add(value)
+                        }
+                        sum.text = calculator.calculate(vars).toString()
+                    }
+                })
+                lay.addView(entry)
+                layout.addView(lay)
+
+            }
+            layout.addView(laysum)
+
+            builder.setView(layout)
+            builder.setPositiveButton(android.R.string.ok,
+                DialogInterface.OnClickListener { _, _ ->
+                    scoreview.setText(sum.text)
+                })
+
+        } else {
+            // Nothing speical... :)
+            layout.orientation = LinearLayout.HORIZONTAL
+            val text = TextView(scoreview.context)
+            text.layoutParams = LAYOUT_PARAMS
+            text.text = "$trackname:"
+            layout.addView(text)
+            val entry = getScoreEntry(scoreview.context)
+            entry.layoutParams = LAYOUT_PARAMS
+            layout.addView(entry)
+            builder.setView(layout)
+
+            builder.setPositiveButton(android.R.string.ok,
+                DialogInterface.OnClickListener { _, _ ->
+                    scoreview.setText(entry.text)
+                })
+        }
+
+        builder.setNegativeButton(android.R.string.cancel, null)
+        // Create the AlertDialog
+        builder.create()
+        builder.show()
     }
 
     // Collect all the scores for all the players in all the tracks
@@ -321,8 +461,12 @@ class ScoreActivity : AppCompatActivity() {
                 var first = true
                 for (track in tracks) {
                     val tf = TrackFragment.newInstance(
-                        playernames.toTypedArray(), track.name, track.colour,
-                        (first && track.default), false
+                        playernames.toTypedArray(),
+                        track.name,
+                        track.colour,
+                        track.special,
+                        (first && track.default),
+                        false
                     )
                     trans.add(R.id.trackLayout, tf)
                     if (!track.default) {
@@ -335,6 +479,7 @@ class ScoreActivity : AppCompatActivity() {
                     playernames.toTypedArray(),
                     "Total",
                     "000000",
+                    null,
                     false,
                     true
                 )

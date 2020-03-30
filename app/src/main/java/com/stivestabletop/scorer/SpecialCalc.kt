@@ -50,8 +50,8 @@ class SpecialCalc(val RPN: String) {
 
     private fun performOp(operation: Char) {
         // Assume operations require two operands
-        val x = popStack()
         val y = popStack()
+        val x = popStack()
         var answer = 0
         when (operation) {
             '+' -> answer = x + y
