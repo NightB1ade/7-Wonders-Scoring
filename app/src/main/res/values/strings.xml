@@ -7,5 +7,5 @@
     <string name="score_conf">Choose score tracks</string>
     <string name="game_change">Changing game will clear the players. Are you sure?</string>
     <string name="menu_reset">Clear players</string>
-    <string name="version">proto_v8</string>
+    <string name="version">proto_v9</string>
 </resources>

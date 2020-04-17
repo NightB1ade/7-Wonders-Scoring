@@ -83,7 +83,7 @@
             android:layout_weight="0.5"
             android:ems="10"
             android:hint="@string/edit_message"
-            android:imeOptions="flagNoFullscreen|actionNext"
+            android:imeOptions="actionNext"
             android:importantForAutofill="no"
             android:inputType="textPersonName"
             android:maxLength="10"
