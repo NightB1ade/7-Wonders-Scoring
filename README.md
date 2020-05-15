@@ -1,6 +1,6 @@
-# 7-Wonders-Scoring
+# BGG Scorer
 
-## Version 9
+## Version 10
 
 * Simple app prototype with two games - 7 Wonders and King/Queendomino
 * First screen is game chooser and player name/type entry - list of players names built and shown
@@ -18,7 +18,11 @@ Current brain dump - also see TODOs in code
 Player entry:
 - [ ] reduce player type list once something chosen (reset on clear)
 - [ ] make player name recording area prettier/better...
-- [ ] player name editing?
+- [ ] player name editing after entry?
+- [ ] change player type list to a look-up with editable text
+- [x] BUG: on landscape layout - show player name editing!
+- [ ] BUG: on return from score activity keyboard entry is NOT displayed!
+- [x] BUG: pressing NEXT player does not select all text of the name
 
 Score entry:
 - [x] invoke dialog (with special calc) entry on track button press (from player 1)
@@ -27,6 +31,9 @@ Score entry:
 - [ ] clean up score dialog entry - make it prettier
 - [ ] dialog at end declaring winner on final score entry?
 - [ ] add auto-focus on the special dialog
+- [ ] add tip text on special dialog and score track name
+- [ ] clean up alignment of totals and entries on special dialog
+- [ ] add MORE feature to special dialog
 
 Other:
 - [ ] make the config strings be internationalized via dynamic lookup on load???

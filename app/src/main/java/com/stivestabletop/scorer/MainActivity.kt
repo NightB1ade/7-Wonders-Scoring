@@ -53,7 +53,7 @@ class MainActivity : AppCompatActivity() {
             // Create initial store of stuff
             supportFragmentManager
                 .beginTransaction()
-                .add(R.id.rootLayout, PlayerDataFragment.newInstance(), PLAYER_LIST)
+                .add(R.id.playersLayout, PlayerDataFragment.newInstance(), PLAYER_LIST)
                 .commit()
         }
         val data = supportFragmentManager.findFragmentByTag(PLAYER_LIST)
@@ -61,7 +61,7 @@ class MainActivity : AppCompatActivity() {
         // Set up player list from any saved fragment
         if (savedInstanceState != null) {
             // Re-use store of players to re-create view
-            val view = findViewById<LinearLayout>(R.id.rootLayout)
+            val view = findViewById<LinearLayout>(R.id.playersLayout)
             if (data is PlayerDataFragment)
                 for ((idx, name) in data.playernames.withIndex())
                     view?.addView(getPlayerText(name, data.playertypes[idx]))
@@ -176,6 +176,18 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+        if (hasFocus) {
+            val editText = findViewById<EditText>(R.id.editPlayer)
+            editText.clearFocus()
+            editText.requestFocus()
+            // TRYING to fix keyboard to show up when back from scoring activity, but this makes
+            // things worse as the keyboard doesn't show up when app started!
+            //window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE)
+        }
+    }
+
     // Set up the player type list
     fun setupPlayerSpinner(context: Context, list: List<String>) {
         // Set up players spinner
@@ -196,19 +208,20 @@ class MainActivity : AppCompatActivity() {
             data.playertypes = mutableListOf<String>()
             setNextPlayer(0)
             enableDone()
-            val view = findViewById<LinearLayout>(R.id.rootLayout)
+            val view = findViewById<LinearLayout>(R.id.playersLayout)
             view.removeAllViewsInLayout()
         }
     }
 
     // Set up the next player text based on the number of players so far
     fun setNextPlayer(players: Int) {
+        val spinner = findViewById<Spinner>(R.id.spinnerPlayer)
+        spinner.setSelection(0)
         val editText = findViewById<EditText>(R.id.editPlayer)
         val num = players + 1
         editText.setText("player " + num.toString())
+        editText.requestFocus()
         editText.selectAll()
-        val spinner = findViewById<Spinner>(R.id.spinnerPlayer)
-        spinner.setSelection(0)
     }
 
     // Get a simple player name/type textview box
@@ -244,7 +257,7 @@ class MainActivity : AppCompatActivity() {
         if (playertype.endsWith("..."))
             playertype = ""
 
-        val view = findViewById<LinearLayout>(R.id.rootLayout)
+        val view = findViewById<LinearLayout>(R.id.playersLayout)
 
         val data = supportFragmentManager.findFragmentByTag(PLAYER_LIST)
         if (data is PlayerDataFragment) {

@@ -76,7 +76,7 @@
         </tracks>
         <tracks>
             <name>Cities</name>
-            <colour>FFFFCC</colour>
+            <colour>363638</colour>
             <default>false</default>
         </tracks>
     </games>
@@ -167,6 +167,69 @@
             <hint>points for buildings that are worth points</hint>
             <colour>E42E24</colour>
             <default>false</default>
+        </tracks>
+    </games>
+    <games>
+        <name>Underwater Cities</name>
+        <players>Colour...</players>
+        <players>Black</players>
+        <players>Blue</players>
+        <players>Orange</players>
+        <players>Purple</players>
+        <tracks>
+            <name>In game</name>
+            <hint>points acquired before the final scoring at the end of the game</hint>
+            <colour>6495ED</colour>
+            <default>true</default>
+        </tracks>
+        <tracks>
+            <name>Metropolis</name>
+            <hint>final-scoring tile - the metropolis in the upper left of your board if connected
+                by both tunnels
+            </hint>
+            <colour>FF7F50</colour>
+            <default>true</default>
+        </tracks>
+        <tracks>
+            <name>Cards</name>
+            <hint>end-scoring cards - cards marked with the stopwatch symbol</hint>
+            <colour>F0FFFF</colour>
+            <default>true</default>
+            <special>
+                <variables>Card 1</variables>
+                <variables>Card 2</variables>
+                <variables>Card 3</variables>
+                <variables>Card 4</variables>
+                <calculation>AB+C+D+</calculation>
+            </special>
+        </tracks>
+        <tracks>
+            <name>Cities</name>
+            <hint>scoring your netowrk - connected cities with different types of buildings</hint>
+            <colour>8B008B</colour>
+            <default>true</default>
+            <special>
+                <variables>City</variables>
+                <variables>City 1 type building</variables>
+                <variables>City 2 types building</variables>
+                <variables>City 3 types building</variables>
+                <calculation>A2*B3*+C4*+D6*+</calculation>
+            </special>
+        </tracks>
+        <tracks>
+            <name>Resources</name>
+            <hint>scoring your resources - conversion into credits and divide by 4 to get points
+            </hint>
+            <colour>7FFFD4</colour>
+            <default>true</default>
+            <special>
+                <variables>Kelp</variables>
+                <variables>Research</variables>
+                <variables>Steelplast</variables>
+                <variables>Biomatter</variables>
+                <variables>Credits</variables>
+                <calculation>D2*A+B+C+E+4/</calculation>
+            </special>
         </tracks>
     </games>
 </root>

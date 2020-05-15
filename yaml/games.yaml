@@ -36,7 +36,7 @@ games:
         special:
           variables:
             - Coins
-          # Extra Reverse Polish Notation of: A / 3
+          # Reverse Polish Notation of: A / 3
           calculation: A3/
       - name: Wonder
         colour: F5B463
@@ -52,7 +52,7 @@ games:
             - Compasses
             - Tablets
             - Cogs
-          # Extra Reverse Polish Notation of: A*A + B*B + C*C + min(A,min(B,C))*7
+          # (Extra) Reverse Polish Notation of: A*A + B*B + C*C + min(A,min(B,C))*7
           calculation: AA*BB*+CC*+BCnAn7*+
       - name: Commercial
         colour: FFEB29
@@ -64,7 +64,7 @@ games:
         colour: FFFFFF
         default: false
       - name: Cities
-        colour: FFFFCC
+        colour: 363638
         default: false
   - name: King/Queendomino
     players:
@@ -85,7 +85,7 @@ games:
         special:
           variables:
             - Coins
-          # Extra Reverse Polish Notation of: A / 3
+          # Reverse Polish Notation of: A / 3
           calculation: A3/
       - name: Fields
         hint: crowns in fields times number of linked field tiles
@@ -95,7 +95,7 @@ games:
           variables:
             - Tiles
             - Crowns
-          # Extra Reverse Polish Notation of: A*B
+          # Reverse Polish Notation of: A * B
           calculation: AB*
           # Ask multiple times and add the result together
           multiple: +
@@ -135,5 +135,56 @@ games:
         hint: points for buildings that are worth points
         colour: E42E24
         default: false
-
-
+  - name: Underwater Cities
+    players:
+      - Colour...
+      - Black
+      - Blue
+      - Orange
+      - Purple
+    tracks:
+      - name: In game
+        hint: points acquired before the final scoring at the end of the game
+        colour: 6495ED
+        default: true
+      - name: Metropolis
+        hint: final-scoring tile - the metropolis in the upper left of your board if connected by both tunnels
+        colour: FF7F50
+        default: true
+      - name: Cards
+        hint: end-scoring cards - cards marked with the stopwatch symbol
+        colour: F0FFFF
+        default: true
+        special:
+          variables:
+            - Card 1
+            - Card 2
+            - Card 3
+            - Card 4
+          # Reverse Polish Notation of: A + B + C + D
+          calculation: AB+C+D+
+      - name: Cities
+        hint: scoring your netowrk - connected cities with different types of buildings
+        colour: 8B008B
+        default: true
+        special:
+          variables:
+            - City
+            - City 1 type building
+            - City 2 types building
+            - City 3 types building
+          # Reverse Polish Notation of: A*2 + B*3 + C*4 + D*6
+          calculation: A2*B3*+C4*+D6*+
+      - name: Resources
+        hint: scoring your resources - conversion into credits and divide by 4 to get points
+        colour: 7FFFD4
+        default: true
+        special:
+          variables:
+            - Kelp
+            - Research
+            - Steelplast
+            - Biomatter
+            - Credits
+          # Reverse Polish Notation of: (D*2 + A + B + C + E) / 4
+          calculation: D2*A+B+C+E+4/

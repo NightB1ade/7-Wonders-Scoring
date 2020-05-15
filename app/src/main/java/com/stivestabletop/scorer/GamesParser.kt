@@ -6,6 +6,7 @@ import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParserException
 import java.io.IOException
 import java.io.InputStream
+import java.util.*
 
 private const val TAG = "GameParser"
 
@@ -158,8 +159,23 @@ class GamesParser(xmlconfig: InputStream) {
     @Throws(IOException::class, XmlPullParserException::class)
     private fun readColour(parser: XmlPullParser): String {
         parser.require(XmlPullParser.START_TAG, ns, "colour")
-        var result = readText(parser)
-        if (result.length != 6) {
+        var result = readText(parser).toUpperCase(Locale.ROOT)
+        // Check that colour is a 6 character hexadecimal
+        var ok: Boolean
+        if (result.length == 6) {
+            ok = true
+            for (char in result.asSequence()) {
+                when (char) {
+                    in '0'..'9' -> ok = true
+                    in 'A'..'F' -> ok = true
+                    else -> ok = false
+                }
+                if (!ok) break
+            }
+        } else {
+            ok = false
+        }
+        if (!ok) {
             Log.w(TAG, "Ignoring invalid colour '$result'")
             result = "FF00FF"
         }
