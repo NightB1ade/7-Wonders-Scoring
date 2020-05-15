@@ -182,6 +182,8 @@ class MainActivity : AppCompatActivity() {
             val autoText = findViewById<AutoCompleteTextView>(R.id.autoPlayer)
             val editText = findViewById<EditText>(R.id.editPlayer)
             autoText.requestFocus()
+            editText.isFocusable = true
+            editText.isFocusableInTouchMode = true
             editText.requestFocus()
             // TRYING to fix keyboard to show up when back from scoring activity, but this makes
             // things worse as the keyboard doesn't show up when app started!

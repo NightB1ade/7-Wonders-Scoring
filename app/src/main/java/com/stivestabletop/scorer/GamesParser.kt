@@ -196,10 +196,16 @@ class GamesParser(xmlconfig: InputStream) {
         return result
     }
 
+    private fun stripString(string: String): String {
+        // Replace any multiple spaces (inc. newlines) in the string with one space
+        // Copes with the formatting in the xml file that splits lines
+        return string.replace("\\s{2,}".toRegex(), " ")
+    }
+
     @Throws(IOException::class, XmlPullParserException::class)
     private fun readHint(parser: XmlPullParser): String {
         parser.require(XmlPullParser.START_TAG, ns, "hint")
-        val result = readText(parser)
+        val result = stripString(readText(parser))
         parser.require(XmlPullParser.END_TAG, ns, "hint")
         return result
     }

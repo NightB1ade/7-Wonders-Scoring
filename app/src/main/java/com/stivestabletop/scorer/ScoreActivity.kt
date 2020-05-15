@@ -4,6 +4,7 @@ import android.app.AlertDialog
 import android.content.Context
 import android.content.DialogInterface
 import android.graphics.Color
+import android.graphics.Typeface
 import android.os.Build
 import android.os.Bundle
 import android.text.Editable
@@ -23,12 +24,23 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.children
 import androidx.fragment.app.Fragment
 
+
 const val TRACKS_LIST = "trackslist"
 
-val LAYOUT_PARAMS = LinearLayout.LayoutParams(
+val LAYOUT_PARAMS_SCORE_VIEW = LinearLayout.LayoutParams(
     0,
     LinearLayout.LayoutParams.WRAP_CONTENT,
     1.0f
+)
+val LAYOUT_PARAMS_SPECIAL_TEXT = LinearLayout.LayoutParams(
+    0,
+    LinearLayout.LayoutParams.WRAP_CONTENT,
+    0.8f
+)
+val LAYOUT_PARAMS_SPECIAL_VALUE = LinearLayout.LayoutParams(
+    0,
+    LinearLayout.LayoutParams.WRAP_CONTENT,
+    0.2f
 )
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -42,7 +54,7 @@ fun getContrastTextColour(bg: Int): Int {
 class TrackFragment : Fragment() {
     companion object {
         fun newInstance(
-            players: Array<String>, name: String, colour: String,
+            players: Array<String>, name: String, colour: String, hint: String,
             special: GamesParser.Special?, first: Boolean, total: Boolean
         ): TrackFragment {
             val f = TrackFragment()
@@ -50,6 +62,7 @@ class TrackFragment : Fragment() {
             args.putStringArray("players", players)
             args.putString("name", name)
             args.putString("colour", colour)
+            args.putString("hint", hint)
             args.putBoolean("first", first) // First visible track to get focus
             args.putBoolean("total", total)
             if (special != null) {
@@ -70,8 +83,9 @@ class TrackFragment : Fragment() {
     ): View? {
         val args = arguments
         var players: Array<String> = arrayOf()
-        var name = ""
+        var tname = ""
         var tcol = ""
+        var thint = ""
         var first = false
         var total = false
         var calculation = ""
@@ -79,8 +93,9 @@ class TrackFragment : Fragment() {
         var multiple = ""
         if (args != null) {
             players = args.getStringArray("players") as Array<String>
-            name = args.getString("name", "track")
+            tname = args.getString("name", "track")
             tcol = "#" + args.getString("colour", "FFFFFF")
+            thint = args.getString("hint", "enter a points value")
             first = args.getBoolean("first", false)
             total = args.getBoolean("total", false)
             calculation = args.getString("calculation", "")
@@ -100,7 +115,8 @@ class TrackFragment : Fragment() {
                 getScoreView(
                     requireContext(),
                     num,
-                    name,
+                    tname,
+                    thint,
                     players[num - 1],
                     calculation,
                     variables,
@@ -114,7 +130,7 @@ class TrackFragment : Fragment() {
 
         // Update the track name/colour
         val nameview = track.findViewById<Button>(R.id.trackName)
-        nameview.text = name
+        nameview.text = tname
         val bgcol = Color.parseColor(tcol)
         nameview.setBackgroundColor(bgcol)
         nameview.setTextColor(getContrastTextColour(bgcol))
@@ -126,7 +142,15 @@ class TrackFragment : Fragment() {
                         // TODO: Currently this displays ALL the dialogs on top of each other
                         // find out how to do a chain of dialogs (that can be broken by cancel!)
                         val ev = layoutview.findViewById<EditText>(num)
-                        specialDialog(ev, players[num - 1], name, calculation, variables, multiple)
+                        specialDialog(
+                            ev,
+                            players[num - 1],
+                            tname,
+                            thint,
+                            calculation,
+                            variables,
+                            multiple
+                        )
                     }
                 }
             })
@@ -163,6 +187,7 @@ class TrackFragment : Fragment() {
         context: Context,
         id: Int,
         trackname: String,
+        trackhint: String,
         playername: String,
         calculation: String,
         variables: Array<String>,
@@ -173,11 +198,19 @@ class TrackFragment : Fragment() {
         view.id = id
         view.tag = trackname
         view.textSize = 12f
-        view.layoutParams = LAYOUT_PARAMS
+        view.layoutParams = LAYOUT_PARAMS_SCORE_VIEW
         if (editable) {
             view.setOnLongClickListener(View.OnLongClickListener { v ->
                 if (v is EditText)
-                    specialDialog(v, playername, trackname, calculation, variables, multiple)
+                    specialDialog(
+                        v,
+                        playername,
+                        trackname,
+                        trackhint,
+                        calculation,
+                        variables,
+                        multiple
+                    )
                 true
             })
 
@@ -209,47 +242,62 @@ class TrackFragment : Fragment() {
         scoreview: EditText,
         playername: String,
         trackname: String,
+        trackhint: String,
         calculation: String,
         variables: Array<String>,
         multiple: String
     ) {
         val builder = AlertDialog.Builder(scoreview.context)
-        builder.setTitle(playername)
+        builder.setTitle("$playername - $trackname")
 
         // Set up layout for entry
         val layout = LinearLayout(scoreview.context)
         // TODO: Make this dialog prettier!
         layout.setPadding(8, 0, 8, 0)
+        layout.orientation = LinearLayout.VERTICAL
 
+        if (trackhint.isNotBlank()) {
+            val hint = TextView(scoreview.context)
+            hint.setPadding(0, 8, 0, 0)
+            hint.setTypeface(null, Typeface.ITALIC)
+            hint.gravity = Gravity.CENTER
+            hint.text = trackhint
+            hint.textSize = 13f
+            layout.addView(hint)
+        }
+
+        var focus_entry: View?
+
+        // TODO: Do something about multiple???
         if (variables.size > 0) {
             // Create special dialog
-            // TODO: Do something about multiple???
-            layout.orientation = LinearLayout.VERTICAL
 
             // Sum
             val laysum = LinearLayout(scoreview.context)
             laysum.orientation = LinearLayout.HORIZONTAL
+            laysum.setPadding(0, 8, 0, 0)
             val sumtext = TextView(scoreview.context)
-            sumtext.layoutParams = LAYOUT_PARAMS
+            sumtext.layoutParams = LAYOUT_PARAMS_SPECIAL_TEXT
             sumtext.text = "$trackname score:"
             laysum.addView(sumtext)
             val sum = TextView(scoreview.context)
-            sum.layoutParams = LAYOUT_PARAMS
+            sum.layoutParams = LAYOUT_PARAMS_SPECIAL_VALUE
             sum.text = "0"
             laysum.addView(sum)
             // Created - but don't add it to layout yet
 
             // Variables & calculator
             val calculator = SpecialCalc(calculation)
+            focus_entry = null
             for ((idx, name) in variables.withIndex()) {
                 val lay = LinearLayout(scoreview.context)
                 lay.orientation = LinearLayout.HORIZONTAL
                 val text = TextView(scoreview.context)
-                text.layoutParams = LAYOUT_PARAMS
+                text.layoutParams = LAYOUT_PARAMS_SPECIAL_TEXT
                 text.text = "$name:"
                 lay.addView(text)
                 val entry = getScoreEntry(scoreview.context)
-                entry.layoutParams = LAYOUT_PARAMS
+                entry.layoutParams = LAYOUT_PARAMS_SPECIAL_VALUE
                 // Set an incremental id from 0 for each variable
                 entry.id = idx
                 entry.addTextChangedListener(object : TextWatcher {
@@ -280,6 +328,7 @@ class TrackFragment : Fragment() {
                         sum.text = calculator.calculate(vars).toString()
                     }
                 })
+                if (idx == 0) focus_entry = entry
                 lay.addView(entry)
                 layout.addView(lay)
 
@@ -294,14 +343,17 @@ class TrackFragment : Fragment() {
 
         } else {
             // Nothing speical... :)
-            layout.orientation = LinearLayout.HORIZONTAL
+            val lay = LinearLayout(scoreview.context)
+            lay.orientation = LinearLayout.HORIZONTAL
             val text = TextView(scoreview.context)
-            text.layoutParams = LAYOUT_PARAMS
+            text.layoutParams = LAYOUT_PARAMS_SPECIAL_TEXT
             text.text = "$trackname:"
-            layout.addView(text)
+            lay.addView(text)
             val entry = getScoreEntry(scoreview.context)
-            entry.layoutParams = LAYOUT_PARAMS
-            layout.addView(entry)
+            entry.layoutParams = LAYOUT_PARAMS_SPECIAL_VALUE
+            focus_entry = entry
+            lay.addView(entry)
+            layout.addView(lay)
             builder.setView(layout)
 
             builder.setPositiveButton(android.R.string.ok,
@@ -310,10 +362,36 @@ class TrackFragment : Fragment() {
                 })
         }
 
-        builder.setNegativeButton(android.R.string.cancel, null)
+        builder.setNegativeButton(R.string.skip, null)
         // Create the AlertDialog
-        builder.create()
-        builder.show()
+        val alert = builder.create()
+        // TODO - make this on show code actually show the keyboard!
+        /* Look at: https://stackoverflow.com/questions/4054662/displaying-soft-keyboard-whenever-alertdialog-builder-object-is-opened
+        alert.setOnShowListener( DialogInterface.OnShowListener { dialog ->
+            if (focus_entry != null) {
+                //focus_entry.isFocusable = true
+                //focus_entry.isFocusableInTouchMode = true
+                focus_entry.requestFocus()
+                //val imm = scoreview.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                //imm.showSoftInput(focus_entry, InputMethodManager.SHOW_IMPLICIT)
+            }
+        })
+        */
+        // TODO - set up next on final part of dialog will close dialog with success?
+        /*
+        // Need to set up last_entry like focus_entry
+        last_entry.setOnEditorActionListener { view, actionId, _ ->
+            return@setOnEditorActionListener when (actionId) {
+                EditorInfo.IME_ACTION_NEXT -> {
+                    alert.dismiss()
+                    scoreview.setText(view.text)
+                    true
+                }
+                else -> false
+            }
+        }
+        */
+        alert.show()
     }
 
     // Collect all the scores for all the players in all the tracks
@@ -464,6 +542,7 @@ class ScoreActivity : AppCompatActivity() {
                         playernames.toTypedArray(),
                         track.name,
                         track.colour,
+                        track.hint,
                         track.special,
                         (first && track.default),
                         false
@@ -479,6 +558,7 @@ class ScoreActivity : AppCompatActivity() {
                     playernames.toTypedArray(),
                     "Total",
                     "000000",
+                    "",
                     null,
                     false,
                     true

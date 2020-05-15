@@ -28,24 +28,35 @@ games:
     tracks:
       - name: Military
         colour: E62E25
+        hint: score for all military tokens including losses
         default: true
+        special:
+          variables:
+            - Victories
+            - Losses
+          # Reverse Polish Notation of: A - B
+          calculation: AB-
       - name: Coins
-        hint: 1 point for every three coins
+        hint: scoring 1 point for every three coins and -1 point for debt tokens
         colour: 9B7A19
         default: true
         special:
           variables:
             - Coins
-          # Reverse Polish Notation of: A / 3
-          calculation: A3/
+            - Debt
+          # Reverse Polish Notation of: (A/3) - B
+          calculation: A3/B-
       - name: Wonder
         colour: F5B463
+        hint: score for built stages of the wonder
         default: true
       - name: Civilian
         colour: 0B4FD9
+        hint: score for all blue civil building cards
         default: true
       - name: Science
         colour: 429F4D
+        hint: score for the combination of science cards
         default: true
         special:
           variables:
@@ -56,15 +67,19 @@ games:
           calculation: AA*BB*+CC*+BCnAn7*+
       - name: Commercial
         colour: FFEB29
+        hint: score for all yellow commerce building cards
         default: true
       - name: Guilds
         colour: 902796
+        hint: score for all purple guild building cards
         default: true
       - name: Leaders
         colour: FFFFFF
+        hint: score for leader cards
         default: false
       - name: Cities
         colour: 363638
+        hint: score for black city building cards
         default: false
   - name: King/Queendomino
     players:
@@ -79,7 +94,7 @@ games:
       - Yellow
     tracks:
       - name: Coins
-        hint: 1 point for every three coins
+        hint: scoring 1 point for every three coins
         colour: 996600
         default: false
         special:

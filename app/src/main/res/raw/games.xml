@@ -26,31 +26,41 @@
         <tracks>
             <name>Military</name>
             <colour>E62E25</colour>
+            <hint>score for all military tokens including losses</hint>
             <default>true</default>
+            <special>
+                <variables>Victories</variables>
+                <variables>Losses</variables>
+                <calculation>AB-</calculation>
+            </special>
         </tracks>
         <tracks>
             <name>Coins</name>
-            <hint>1 point for every three coins</hint>
+            <hint>scoring 1 point for every three coins and -1 point for debt tokens</hint>
             <colour>9B7A19</colour>
             <default>true</default>
             <special>
                 <variables>Coins</variables>
-                <calculation>A3/</calculation>
+                <variables>Debt</variables>
+                <calculation>A3/B-</calculation>
             </special>
         </tracks>
         <tracks>
             <name>Wonder</name>
             <colour>F5B463</colour>
+            <hint>score for built stages of the wonder</hint>
             <default>true</default>
         </tracks>
         <tracks>
             <name>Civilian</name>
             <colour>0B4FD9</colour>
+            <hint>score for all blue civil building cards</hint>
             <default>true</default>
         </tracks>
         <tracks>
             <name>Science</name>
             <colour>429F4D</colour>
+            <hint>score for the combination of science cards</hint>
             <default>true</default>
             <special>
                 <variables>Compasses</variables>
@@ -62,21 +72,25 @@
         <tracks>
             <name>Commercial</name>
             <colour>FFEB29</colour>
+            <hint>score for all yellow commerce building cards</hint>
             <default>true</default>
         </tracks>
         <tracks>
             <name>Guilds</name>
             <colour>902796</colour>
+            <hint>score for all purple guild building cards</hint>
             <default>true</default>
         </tracks>
         <tracks>
             <name>Leaders</name>
             <colour>FFFFFF</colour>
+            <hint>score for leader cards</hint>
             <default>false</default>
         </tracks>
         <tracks>
             <name>Cities</name>
             <colour>363638</colour>
+            <hint>score for black city building cards</hint>
             <default>false</default>
         </tracks>
     </games>
@@ -93,7 +107,7 @@
         <players>Yellow</players>
         <tracks>
             <name>Coins</name>
-            <hint>1 point for every three coins</hint>
+            <hint>scoring 1 point for every three coins</hint>
             <colour>996600</colour>
             <default>false</default>
             <special>
