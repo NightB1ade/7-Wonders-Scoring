@@ -9,6 +9,7 @@ import java.io.InputStream
 import java.util.*
 
 private const val TAG = "GameParser"
+private const val MAX_PLAYER_LEN = 15
 
 // NOTE based on code from "Parse XML data" in:
 // https://developer.android.com/training/basics/network-ops/xml#kotlin
@@ -125,7 +126,11 @@ class GamesParser(xmlconfig: InputStream) {
     @Throws(IOException::class, XmlPullParserException::class)
     private fun readPlayer(parser: XmlPullParser): String {
         parser.require(XmlPullParser.START_TAG, ns, "players")
-        val result = readText(parser)
+        var result = readText(parser)
+        if (result.length > MAX_PLAYER_LEN) {
+            Log.w(TAG, "Player type '$result' is too long, truncated to $MAX_PLAYER_LEN chars")
+            result = result.substring(0, MAX_PLAYER_LEN)
+        }
         parser.require(XmlPullParser.END_TAG, ns, "players")
         return result
     }

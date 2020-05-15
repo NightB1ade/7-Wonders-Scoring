@@ -57,16 +57,26 @@
                     android:imeOptions="flagNoFullscreen|actionNext"
                     android:importantForAutofill="no"
                     android:inputType="textPersonName"
-                    android:maxLength="10"
+                    android:maxLength="15"
                     android:maxLines="1"
                     android:selectAllOnFocus="true"
                     android:textIsSelectable="true" />
 
-                <Spinner
-                    android:id="@+id/spinnerPlayer"
+                <AutoCompleteTextView
+                    android:id="@+id/autoPlayer"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
-                    android:layout_weight="0.5" />
+                    android:layout_weight="0.5"
+                    android:ems="10"
+                    android:completionThreshold="0"
+                    android:hint="@string/auto_message"
+                    android:imeOptions="flagNoFullscreen|actionNext"
+                    android:importantForAutofill="no"
+                    android:inputType="text"
+                    android:maxLength="15"
+                    android:maxLines="1"
+                    android:selectAllOnFocus="true"
+                    android:textIsSelectable="true" />
 
                 <Button
                     android:id="@+id/buttonNext"

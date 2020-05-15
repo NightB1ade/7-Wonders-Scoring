@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">BGG Scorer</string>
     <string name="edit_message">Enter next players name</string>
+    <string name="auto_message">Enter player type/colour</string>
+    <string name="default_player_string">player %d</string>
     <string name="button_next">Next</string>
     <string name="button_done">Done</string>
     <string name="menu_config">Configure</string>

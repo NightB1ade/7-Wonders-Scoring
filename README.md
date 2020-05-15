@@ -2,7 +2,7 @@
 
 ## Version 10
 
-* Simple app prototype with two games - 7 Wonders and King/Queendomino
+* Simple app prototype with three games - 7 Wonders, King/Queendomino & Underwater cities
 * First screen is game chooser and player name/type entry - list of players names built and shown
 * Players can be cleared via menu
 * Second screen is dynamic to number of players, and sets up score tracks based on chosen game

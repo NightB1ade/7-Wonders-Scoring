@@ -68,10 +68,10 @@ class MainActivity : AppCompatActivity() {
         }
 
         // Add listener to perform add player on screen-keyboard enter
-        findViewById<EditText>(R.id.editPlayer).setOnEditorActionListener { v, actionId, _ ->
+        findViewById<AutoCompleteTextView>(R.id.autoPlayer).setOnEditorActionListener { view, actionId, _ ->
             return@setOnEditorActionListener when (actionId) {
-                EditorInfo.IME_ACTION_SEND -> {
-                    addPlayer(v)
+                EditorInfo.IME_ACTION_NEXT -> {
+                    addPlayer(view)
                     true
                 }
                 else -> false
@@ -88,7 +88,7 @@ class MainActivity : AppCompatActivity() {
         if (data is PlayerDataFragment && !data.gamename.isBlank()) {
             // Set up chosen game
             view.setSelection(adapter.getPosition(data.gamename))
-            setupPlayerSpinner(applicationContext, gamesconfig.getPlayersList(data.gamename))
+            setupPlayerTypes(applicationContext, gamesconfig.getPlayersList(data.gamename))
         }
 
         // Set up listener for game change
@@ -106,7 +106,7 @@ class MainActivity : AppCompatActivity() {
                     if (data.gamename.isBlank()) {
                         // Initialization
                         data.gamename = gamename
-                        setupPlayerSpinner(parent.context, gamesconfig.getPlayersList(gamename))
+                        setupPlayerTypes(parent.context, gamesconfig.getPlayersList(gamename))
                     } else {
                         if (data.gamename != gamename) {
                             if (data.playernames.size > 0) {
@@ -117,7 +117,7 @@ class MainActivity : AppCompatActivity() {
                                         DialogInterface.OnClickListener { _, _ ->
                                             data.gamename = gamename
                                             clearPlayers()
-                                            setupPlayerSpinner(
+                                            setupPlayerTypes(
                                                 parent.context,
                                                 gamesconfig.getPlayersList(gamename)
                                             )
@@ -135,7 +135,7 @@ class MainActivity : AppCompatActivity() {
                                 builder.show()
                             } else {
                                 data.gamename = gamename
-                                setupPlayerSpinner(
+                                setupPlayerTypes(
                                     parent.context,
                                     gamesconfig.getPlayersList(gamename)
                                 )
@@ -179,8 +179,9 @@ class MainActivity : AppCompatActivity() {
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)
         if (hasFocus) {
+            val autoText = findViewById<AutoCompleteTextView>(R.id.autoPlayer)
             val editText = findViewById<EditText>(R.id.editPlayer)
-            editText.clearFocus()
+            autoText.requestFocus()
             editText.requestFocus()
             // TRYING to fix keyboard to show up when back from scoring activity, but this makes
             // things worse as the keyboard doesn't show up when app started!
@@ -189,15 +190,16 @@ class MainActivity : AppCompatActivity() {
     }
 
     // Set up the player type list
-    fun setupPlayerSpinner(context: Context, list: List<String>) {
-        // Set up players spinner
-        val view = findViewById<Spinner>(R.id.spinnerPlayer)
+    fun setupPlayerTypes(context: Context, list: List<String>) {
+        val view = findViewById<AutoCompleteTextView>(R.id.autoPlayer)
+        view.completionHint = list[0]
+        view.hint = list[0]
         val adapter = ArrayAdapter(
             context,
-            R.layout.support_simple_spinner_dropdown_item,
-            list
+            android.R.layout.simple_dropdown_item_1line,
+            list.subList(1, list.lastIndex + 1)
         )
-        view.adapter = adapter
+        view.setAdapter(adapter)
     }
 
     // Clear all the listed players
@@ -215,11 +217,11 @@ class MainActivity : AppCompatActivity() {
 
     // Set up the next player text based on the number of players so far
     fun setNextPlayer(players: Int) {
-        val spinner = findViewById<Spinner>(R.id.spinnerPlayer)
-        spinner.setSelection(0)
+        val autoText = findViewById<AutoCompleteTextView>(R.id.autoPlayer)
+        autoText.setText("")
         val editText = findViewById<EditText>(R.id.editPlayer)
         val num = players + 1
-        editText.setText("player " + num.toString())
+        editText.setText(getString(R.string.default_player_string, num))
         editText.requestFocus()
         editText.selectAll()
     }
@@ -247,17 +249,21 @@ class MainActivity : AppCompatActivity() {
     }
 
     // Add a new player to the list
-    @Suppress("UNUSED_PARAMETER")
-    fun addPlayer(v: View) {
+    fun addPlayer(view: View) {
         val editText = findViewById<EditText>(R.id.editPlayer)
         val playername = editText.text.toString()
-        val spinner = findViewById<Spinner>(R.id.spinnerPlayer)
-        var playertype = spinner.selectedItem.toString()
+        val autoText: AutoCompleteTextView
+        if (view is AutoCompleteTextView) {
+            autoText = view
+        } else {
+            autoText = findViewById<AutoCompleteTextView>(R.id.autoPlayer)
+        }
+        var playertype = autoText.text.toString()
         // Check for no selected type
         if (playertype.endsWith("..."))
             playertype = ""
 
-        val view = findViewById<LinearLayout>(R.id.playersLayout)
+        val layout = findViewById<LinearLayout>(R.id.playersLayout)
 
         val data = supportFragmentManager.findFragmentByTag(PLAYER_LIST)
         if (data is PlayerDataFragment) {
@@ -266,7 +272,7 @@ class MainActivity : AppCompatActivity() {
             setNextPlayer(data.playernames.size)
         }
         // add player to layout
-        view?.addView(getPlayerText(playername, playertype))
+        layout?.addView(getPlayerText(playername, playertype))
         // Enable done if we have enough players
         enableDone()
     }
