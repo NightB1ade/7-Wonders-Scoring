@@ -134,6 +134,8 @@ class TrackFragment : Fragment() {
         if (!total) {
             nameview.setOnClickListener(View.OnClickListener { v ->
                 if (v is Button) {
+                    val move_focus = layoutview.findViewById<EditText>(1)
+                    move_focus.requestFocus()
                     // Show the dialogs for this score track, one player at a time
                     for (num in players.size downTo 1) {
                         // TODO: Currently this displays ALL the dialogs on top of each other
@@ -198,7 +200,8 @@ class TrackFragment : Fragment() {
         view.layoutParams = LAYOUT_PARAMS_SCORE_VIEW
         if (editable) {
             view.setOnLongClickListener(View.OnLongClickListener { v ->
-                if (v is EditText)
+                if (v is EditText) {
+                    v.requestFocus()
                     specialDialog(
                         v,
                         playername,
@@ -208,6 +211,7 @@ class TrackFragment : Fragment() {
                         variables,
                         multiple
                     )
+                }
                 true
             })
 
@@ -360,6 +364,7 @@ class TrackFragment : Fragment() {
         builder.setPositiveButton(android.R.string.ok,
             DialogInterface.OnClickListener { _, _ ->
                 scoreview.setText(sum.text)
+                calculateScores()
             })
 
         builder.setNegativeButton(R.string.skip, null)
@@ -378,6 +383,7 @@ class TrackFragment : Fragment() {
                     EditorInfo.IME_ACTION_NEXT -> {
                         alert.dismiss()
                         scoreview.setText(sum.text)
+                        calculateScores()
                         true
                     }
                     else -> false

@@ -26,6 +26,8 @@ Score entry:
 - [ ] dialog at end declaring winner on final score entry?
 - [x] BUG: add auto-focus + keyboard on the special dialog
 - [ ] add MULTIPLE feature to special dialog
+- [ ] Set focus on next row/box if special dialog invoked
+- [x] BUG: Make sure totals updated after special dialog
 
 Other:
 - [ ] make the config strings be internationalized via dynamic lookup on load???
