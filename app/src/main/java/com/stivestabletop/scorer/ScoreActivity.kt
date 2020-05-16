@@ -14,10 +14,7 @@ import android.text.InputType
 import android.text.TextWatcher
 import android.view.*
 import android.view.inputmethod.EditorInfo
-import android.widget.Button
-import android.widget.EditText
-import android.widget.LinearLayout
-import android.widget.TextView
+import android.widget.*
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -266,7 +263,10 @@ class TrackFragment : Fragment() {
             layout.addView(hint)
         }
 
-        var focus_entry: View?
+        var first_entry: EditText?
+        var last_entry: EditText?
+        // Either a single EditText or a sum TextView
+        val sum: TextView
 
         // TODO: Do something about multiple???
         if (variables.size > 0) {
@@ -278,9 +278,9 @@ class TrackFragment : Fragment() {
             laysum.setPadding(0, 8, 0, 0)
             val sumtext = TextView(scoreview.context)
             sumtext.layoutParams = LAYOUT_PARAMS_SPECIAL_TEXT
-            sumtext.text = "$trackname score:"
+            sumtext.text = getString(R.string.special_dialog_name_score, trackname)
             laysum.addView(sumtext)
-            val sum = TextView(scoreview.context)
+            sum = TextView(scoreview.context)
             sum.layoutParams = LAYOUT_PARAMS_SPECIAL_VALUE
             sum.text = "0"
             laysum.addView(sum)
@@ -288,13 +288,15 @@ class TrackFragment : Fragment() {
 
             // Variables & calculator
             val calculator = SpecialCalc(calculation)
-            focus_entry = null
+            first_entry = null
+            last_entry = null
+
             for ((idx, name) in variables.withIndex()) {
                 val lay = LinearLayout(scoreview.context)
                 lay.orientation = LinearLayout.HORIZONTAL
                 val text = TextView(scoreview.context)
                 text.layoutParams = LAYOUT_PARAMS_SPECIAL_TEXT
-                text.text = "$name:"
+                text.text = getString(R.string.special_dialog_name_no_score, name)
                 lay.addView(text)
                 val entry = getScoreEntry(scoreview.context)
                 entry.layoutParams = LAYOUT_PARAMS_SPECIAL_VALUE
@@ -328,71 +330,68 @@ class TrackFragment : Fragment() {
                         sum.text = calculator.calculate(vars).toString()
                     }
                 })
-                if (idx == 0) focus_entry = entry
+                if (idx == 0) first_entry = entry
+                if (idx == variables.lastIndex) last_entry = entry
                 lay.addView(entry)
                 layout.addView(lay)
 
             }
             layout.addView(laysum)
-
-            builder.setView(layout)
-            builder.setPositiveButton(android.R.string.ok,
-                DialogInterface.OnClickListener { _, _ ->
-                    scoreview.setText(sum.text)
-                })
-
         } else {
             // Nothing speical... :)
             val lay = LinearLayout(scoreview.context)
             lay.orientation = LinearLayout.HORIZONTAL
             val text = TextView(scoreview.context)
             text.layoutParams = LAYOUT_PARAMS_SPECIAL_TEXT
-            text.text = "$trackname:"
+            text.text = getString(R.string.special_dialog_name_no_score, trackname)
             lay.addView(text)
-            val entry = getScoreEntry(scoreview.context)
-            entry.layoutParams = LAYOUT_PARAMS_SPECIAL_VALUE
-            focus_entry = entry
-            lay.addView(entry)
+            sum = getScoreEntry(scoreview.context)
+            sum.layoutParams = LAYOUT_PARAMS_SPECIAL_VALUE
+            first_entry = sum
+            last_entry = sum
+            lay.addView(sum)
             layout.addView(lay)
-            builder.setView(layout)
-
-            builder.setPositiveButton(android.R.string.ok,
-                DialogInterface.OnClickListener { _, _ ->
-                    scoreview.setText(entry.text)
-                })
         }
+
+        val scroll = ScrollView(scoreview.context)
+        scroll.addView(layout)
+        builder.setView(scroll)
+
+        builder.setPositiveButton(android.R.string.ok,
+            DialogInterface.OnClickListener { _, _ ->
+                scoreview.setText(sum.text)
+            })
 
         builder.setNegativeButton(R.string.skip, null)
-        // Create the AlertDialog
+
         val alert = builder.create()
-        // TODO - make this on show code actually show the keyboard!
-        /* Look at: https://stackoverflow.com/questions/4054662/displaying-soft-keyboard-whenever-alertdialog-builder-object-is-opened
+        // Focus on first entry on show
         alert.setOnShowListener( DialogInterface.OnShowListener { dialog ->
-            if (focus_entry != null) {
-                //focus_entry.isFocusable = true
-                //focus_entry.isFocusableInTouchMode = true
-                focus_entry.requestFocus()
-                //val imm = scoreview.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                //imm.showSoftInput(focus_entry, InputMethodManager.SHOW_IMPLICIT)
+            if (first_entry != null) {
+                first_entry.requestFocus()
             }
         })
-        */
-        // TODO - set up next on final part of dialog will close dialog with success?
-        /*
-        // Need to set up last_entry like focus_entry
-        last_entry.setOnEditorActionListener { view, actionId, _ ->
-            return@setOnEditorActionListener when (actionId) {
-                EditorInfo.IME_ACTION_NEXT -> {
-                    alert.dismiss()
-                    scoreview.setText(view.text)
-                    true
+        // Make last entry action next dimiss the dialog
+        if (last_entry != null) {
+            last_entry.setOnEditorActionListener { _, actionId, _ ->
+                return@setOnEditorActionListener when (actionId) {
+                    EditorInfo.IME_ACTION_NEXT -> {
+                        alert.dismiss()
+                        scoreview.setText(sum.text)
+                        true
+                    }
+                    else -> false
                 }
-                else -> false
             }
         }
-        */
+
         alert.show()
+        // FIX: to show soft keyboard all the time for the dialog
+        val window = alert.window
+        window?.clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM)
+        window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
     }
+
 
     // Collect all the scores for all the players in all the tracks
     // TODO: Do we have to re-calculate everything?

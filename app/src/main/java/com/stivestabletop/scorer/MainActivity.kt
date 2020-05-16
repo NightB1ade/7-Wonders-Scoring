@@ -1,5 +1,6 @@
 package com.stivestabletop.scorer
 
+import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
 import android.content.DialogInterface
@@ -10,6 +11,7 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -176,19 +178,19 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    override fun onWindowFocusChanged(hasFocus: Boolean) {
-        super.onWindowFocusChanged(hasFocus)
-        if (hasFocus) {
-            val autoText = findViewById<AutoCompleteTextView>(R.id.autoPlayer)
-            val editText = findViewById<EditText>(R.id.editPlayer)
-            autoText.requestFocus()
-            editText.isFocusable = true
-            editText.isFocusableInTouchMode = true
-            editText.requestFocus()
-            // TRYING to fix keyboard to show up when back from scoring activity, but this makes
-            // things worse as the keyboard doesn't show up when app started!
-            //window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE)
-        }
+    // FIX: for keyboard not showing up when you either hit back from score activity or continue app
+    // from background
+    override fun onResume() {
+        super.onResume()
+        val imm = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY)
+    }
+
+    // FIX: Part of keyboard fix - see onResume
+    override fun onPause() {
+        super.onPause()
+        val imm = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0)
     }
 
     // Set up the player type list

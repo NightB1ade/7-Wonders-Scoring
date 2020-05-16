@@ -1,6 +1,6 @@
 # BGG Scorer
 
-## Version 10
+## Version 11
 
 * Simple app prototype with three games - 7 Wonders, King/Queendomino & Underwater cities
 * First screen is game chooser and player name/type entry - list of players names built and shown
@@ -19,26 +19,26 @@ Player entry:
 - [ ] reduce player type list once something chosen (reset on clear)
 - [ ] make player name recording area prettier/better...
 - [ ] player name editing after entry?
-- [x] change player type list to a look-up with editable text
-- [x] BUG: on landscape layout - show player name editing!
-- [ ] BUG: on return from score activity keyboard entry is NOT displayed!
-- [x] BUG: pressing NEXT player does not select all text of the name
+- [x] BUG: on return from score activity keyboard entry is NOT displayed!
 
 Score entry:
-- [x] invoke dialog (with special calc) entry on track button press (from player 1)
-- [x] implement special dialog instead of just single entry on long press on score
 - [ ] tool tip text on track buttons?
-- [x] clean up score dialog entry - make it prettier
 - [ ] dialog at end declaring winner on final score entry?
-- [ ] BUG: add auto-focus + keyboard on the special dialog
-- [x] add tip text on special dialog and score track name
-- [x] clean up alignment of totals and entries on special dialog
-- [ ] add MORE feature to special dialog
+- [x] BUG: add auto-focus + keyboard on the special dialog
+- [ ] add MULTIPLE feature to special dialog
 
 Other:
 - [ ] make the config strings be internationalized via dynamic lookup on load???
 
 Done:
+- [x] add tip text on special dialog and score track name
+- [x] clean up alignment of totals and entries on special dialog
+- [x] clean up score dialog entry - make it prettier
+- [x] invoke dialog (with special calc) entry on track button press (from player 1)
+- [x] implement special dialog instead of just single entry on long press on score
+- [x] change player type list to a look-up with editable text
+- [x] BUG: on landscape layout - show player name editing!
+- [x] BUG: pressing NEXT player does not select all text of the name
 - [x] don't allow zero players
 - [x] make number players dynamic based on first screen
 - [x] default player names to "player X" and pre-selected for easy edit/entry
