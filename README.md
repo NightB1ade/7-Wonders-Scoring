@@ -1,6 +1,6 @@
 # BGG Scorer
 
-## Version 11
+## Version 12
 
 * Simple app prototype with three games - 7 Wonders, King/Queendomino & Underwater cities
 * First screen is game chooser and player name/type entry - list of players names built and shown
@@ -10,6 +10,7 @@
 * Totals are tracked dynamically
 * Button press on track name opens helper dialogs for each player inc special calc as needed
 * Long press on score opens helper dialog including special calc as needed
+* Helper dialog supports sub-total for games that have multiple scores - such as King/Queendomino
 * Back button will take you back to player entry
 
 ## Next steps
@@ -19,20 +20,20 @@ Player entry:
 - [ ] reduce player type list once something chosen (reset on clear)
 - [ ] make player name recording area prettier/better...
 - [ ] player name editing after entry?
-- [x] BUG: on return from score activity keyboard entry is NOT displayed!
 
 Score entry:
 - [ ] tool tip text on track buttons?
 - [ ] dialog at end declaring winner on final score entry?
-- [x] BUG: add auto-focus + keyboard on the special dialog
-- [ ] add MULTIPLE feature to special dialog
-- [ ] Set focus on next row/box if special dialog invoked
-- [x] BUG: Make sure totals updated after special dialog
+- [x] add MULTIPLE feature to special dialog
+- [ ] Set focus on NEXT row/box if special dialog invoked
 
 Other:
 - [ ] make the config strings be internationalized via dynamic lookup on load???
 
 Done:
+- [x] BUG: Make sure totals updated after special dialog
+- [x] BUG: add auto-focus + keyboard on the special dialog
+- [x] BUG: on return from score activity keyboard entry is NOT displayed!
 - [x] add tip text on special dialog and score track name
 - [x] clean up alignment of totals and entries on special dialog
 - [x] clean up score dialog entry - make it prettier

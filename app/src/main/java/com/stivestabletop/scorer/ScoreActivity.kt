@@ -100,7 +100,7 @@ class TrackFragment : Fragment() {
             calculation = args.getString("calculation", "")
             if (args.containsKey("variables"))
                 variables = args.getStringArray("variables") as Array<String>
-            multiple = ""
+            multiple = args.getString("multiple", "")
         }
         // Create new track fragment
         val track = inflater.inflate(R.layout.fragment_line, container, false)
@@ -166,7 +166,6 @@ class TrackFragment : Fragment() {
 
     override fun onHiddenChanged(hidden: Boolean) {
         super.onHiddenChanged(hidden)
-        // TODO - do this for every track that gets hidden?
         calculateScores()
     }
 
@@ -247,6 +246,7 @@ class TrackFragment : Fragment() {
         return view
     }
 
+    // TODO: Make this into a Dialog class?
     fun specialDialog(
         scoreview: EditText,
         playername: String,
@@ -257,17 +257,18 @@ class TrackFragment : Fragment() {
         multiple: String,
         nextdialog: AlertDialog?
     ): AlertDialog {
-        val builder = AlertDialog.Builder(scoreview.context)
+        val context = scoreview.context
+        val builder = AlertDialog.Builder(context)
         builder.setTitle("$playername - $trackname")
 
         // Set up layout for entry
-        val layout = LinearLayout(scoreview.context)
-        // TODO: Make this dialog prettier!
+        val layout = LinearLayout(context)
+
         layout.setPadding(8, 0, 8, 0)
         layout.orientation = LinearLayout.VERTICAL
 
         if (trackhint.isNotBlank()) {
-            val hint = TextView(scoreview.context)
+            val hint = TextView(context)
             hint.setPadding(0, 8, 0, 0)
             hint.setTypeface(null, Typeface.ITALIC)
             hint.gravity = Gravity.CENTER
@@ -276,42 +277,55 @@ class TrackFragment : Fragment() {
             layout.addView(hint)
         }
 
-        var first_entry: EditText?
-        var last_entry: EditText?
+        var first_entry: EditText? = null
+        var last_entry: EditText? = null
         // Either a single EditText or a sum TextView
         val sum: TextView
 
-        // TODO: Do something about multiple???
         if (variables.size > 0) {
             // Create special dialog
 
             // Sum
-            val laysum = LinearLayout(scoreview.context)
+            val laysum = LinearLayout(context)
             laysum.orientation = LinearLayout.HORIZONTAL
+            // TODO: Fix padding issues?
             laysum.setPadding(0, 8, 0, 0)
-            val sumtext = TextView(scoreview.context)
+            val sumtext = TextView(context)
             sumtext.layoutParams = LAYOUT_PARAMS_SPECIAL_TEXT
             sumtext.text = getString(R.string.special_dialog_name_score, trackname)
             laysum.addView(sumtext)
-            sum = TextView(scoreview.context)
+            sum = TextView(context)
             sum.layoutParams = LAYOUT_PARAMS_SPECIAL_VALUE
             sum.text = "0"
             laysum.addView(sum)
             // Created - but don't add it to layout yet
 
+            var laymulti: LinearLayout? = null
+            var multitotal: TextView? = null
+            if (multiple.isNotBlank()) {
+                laymulti = LinearLayout(context)
+                laymulti.orientation = LinearLayout.HORIZONTAL
+                laymulti.setPadding(0, 8, 0, 0)
+                val multitext = TextView(context)
+                multitext.layoutParams = LAYOUT_PARAMS_SPECIAL_TEXT
+                multitext.text = getString(R.string.special_dialog_multi_sub_total)
+                laymulti.addView(multitext)
+                multitotal = TextView(context)
+                multitotal.layoutParams = LAYOUT_PARAMS_SPECIAL_VALUE
+                multitotal.text = "0"
+                laymulti.addView(multitotal)
+            }
             // Variables & calculator
             val calculator = SpecialCalc(calculation)
-            first_entry = null
-            last_entry = null
 
             for ((idx, name) in variables.withIndex()) {
-                val lay = LinearLayout(scoreview.context)
+                val lay = LinearLayout(context)
                 lay.orientation = LinearLayout.HORIZONTAL
-                val text = TextView(scoreview.context)
+                val text = TextView(context)
                 text.layoutParams = LAYOUT_PARAMS_SPECIAL_TEXT
                 text.text = getString(R.string.special_dialog_name_no_score, name)
                 lay.addView(text)
-                val entry = getScoreEntry(scoreview.context)
+                val entry = getScoreEntry(context)
                 entry.layoutParams = LAYOUT_PARAMS_SPECIAL_VALUE
                 // Set an incremental id from 1 for each variable (zero is invalid)
                 entry.id = idx + 1
@@ -340,25 +354,55 @@ class TrackFragment : Fragment() {
                             }
                             vars.add(value)
                         }
-                        sum.text = calculator.calculate(vars).toString()
+                        if (multitotal == null) {
+                            sum.text = calculator.calculate(vars).toString()
+                        } else {
+                            // Multiple sub total - add this in
+                            // NOTE: Only "+" is supported for multiple operation
+                            val subtotal = multitotal.text.toString().toInt()
+                            sum.text = (calculator.calculate(vars) + subtotal).toString()
+                        }
                     }
                 })
                 if (idx == 0) first_entry = entry
                 if (idx == variables.lastIndex) last_entry = entry
                 lay.addView(entry)
                 layout.addView(lay)
-
             }
-            layout.addView(laysum)
+            if (laymulti != null && multitotal != null) {
+                layout.addView(laymulti)
+                layout.addView(laysum)
+                val multibutt = Button(context)
+                multibutt.text = getString(R.string.special_dialog_multi_button)
+                multibutt.setOnClickListener(View.OnClickListener { v ->
+                    // This means we copy the current sum to allow multiple inputs
+                    if (sum.text.toString() != "0") {
+                        // Make a not of the current sum
+                        multitotal.text = sum.text
+                        // Now zero all the variables (which will change the sum!)
+                        for (id in variables.indices) {
+                            val ev = layout.findViewById<EditText>(id + 1)
+                            ev.setText("")
+                            // Set focus back on to the first variable
+                            if (id == 0)
+                                ev.requestFocus()
+                        }
+                    }
+                })
+                layout.addView(multibutt)
+            } else {
+                layout.addView(laysum)
+            }
+
         } else {
             // Nothing speical... :)
-            val lay = LinearLayout(scoreview.context)
+            val lay = LinearLayout(context)
             lay.orientation = LinearLayout.HORIZONTAL
-            val text = TextView(scoreview.context)
+            val text = TextView(context)
             text.layoutParams = LAYOUT_PARAMS_SPECIAL_TEXT
             text.text = getString(R.string.special_dialog_name_no_score, trackname)
             lay.addView(text)
-            sum = getScoreEntry(scoreview.context)
+            sum = getScoreEntry(context)
             sum.layoutParams = LAYOUT_PARAMS_SPECIAL_VALUE
             first_entry = sum
             last_entry = sum
@@ -366,7 +410,7 @@ class TrackFragment : Fragment() {
             layout.addView(lay)
         }
 
-        val scroll = ScrollView(scoreview.context)
+        val scroll = ScrollView(context)
         scroll.addView(layout)
         builder.setView(scroll)
 
@@ -416,7 +460,7 @@ class TrackFragment : Fragment() {
 
 
     // Collect all the scores for all the players in all the tracks
-    // TODO: Do we have to re-calculate everything?
+    // NOTE: Currently we re-calculate everything, could be improved for perf in future if needed
     fun calculateScores() {
         // Map of scores - key = player number, value = running total
         val scores = mutableMapOf<Int, Int>()
@@ -475,7 +519,6 @@ class TrackFragment : Fragment() {
 class TracksDataFragment : Fragment() {
     var players = 0
 
-    // TODO - probably doesn't need to be mutable!
     private var tracks = mutableListOf<GamesParser.Track>()
     private var actives = mutableListOf<Boolean>()
 
@@ -538,7 +581,8 @@ class ScoreActivity : AppCompatActivity() {
         }
 
         val xmlconfig = resources.openRawResource(R.raw.games)
-        // TODO: Is it worth passing this from main activity, rather than re-read?
+        // NOTE: We could pass this from main activity, but it requires a lot of serialization, so
+        // its probably not worth it
         val gamesconfig = GamesParser(xmlconfig)
 
         val gamename = bundle?.getString(GAME_NAME)
@@ -620,7 +664,7 @@ class ScoreActivity : AppCompatActivity() {
             ) { _, which, isChecked ->
                 actives[which] = isChecked
             }
-            // TODO: Add cancel?
+
             builder.setPositiveButton(android.R.string.ok) { _, _ ->
                 data.setActives(actives)
                 // Update tracks

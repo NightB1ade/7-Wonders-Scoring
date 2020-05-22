@@ -3,8 +3,10 @@
     <string name="edit_message">Enter next players name</string>
     <string name="auto_message">Enter player type/colour</string>
     <string name="default_player_string">player %d</string>
-    <string name="special_dialog_name_score">score %s:</string>
+    <string name="special_dialog_name_score">Total %s:</string>
     <string name="special_dialog_name_no_score">%s:</string>
+    <string name="special_dialog_multi_sub_total">Sub total</string>
+    <string name="special_dialog_multi_button">Save as sub-total</string>
     <string name="button_next">Next</string>
     <string name="button_done">Done</string>
     <string name="menu_config">Configure</string>
@@ -12,5 +14,5 @@
     <string name="game_change">Changing game will clear the players. Are you sure?</string>
     <string name="menu_reset">Clear players</string>
     <string name="skip">Skip</string>
-    <string name="version">proto_v11</string>
+    <string name="version">proto_v12</string>
 </resources>

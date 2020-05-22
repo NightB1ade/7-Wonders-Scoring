@@ -43,7 +43,7 @@ games:
         special:
           variables:
             - Coins
-            - Debt
+            - Debt tokens
           # Reverse Polish Notation of: (A/3) - B
           calculation: A3/B-
       - name: Wonder
@@ -73,6 +73,14 @@ games:
         colour: 902796
         hint: score for all purple guild building cards
         default: true
+        special:
+          variables:
+            - Guild 1
+            - Guild 2
+            - Guild 3
+            - Guild 4
+          # Reverse Polish Notation of: A + B + C + D
+          calculation: AB+C+D+
       - name: Leaders
         colour: FFFFFF
         hint: score for leader cards
@@ -118,30 +126,86 @@ games:
         hint: crowns in forests times number of linked forest tiles
         colour: 3D7C36
         default: true
+        special:
+          variables:
+            - Tiles
+            - Crowns
+          # Reverse Polish Notation of: A * B
+          calculation: AB*
+          # Ask multiple times and add the result together
+          multiple: +
       - name: Lakes
         hint: crowns in lakes times number of linked lake tiles
         colour: 207DF5
         default: true
+        special:
+          variables:
+            - Tiles
+            - Crowns
+          # Reverse Polish Notation of: A * B
+          calculation: AB*
+          # Ask multiple times and add the result together
+          multiple: +
       - name: Prairies
         hint: crowns in prairies times number of linked prairie tiles
         colour: 90CC17
         default: true
+        special:
+          variables:
+            - Tiles
+            - Crowns
+          # Reverse Polish Notation of: A * B
+          calculation: AB*
+          # Ask multiple times and add the result together
+          multiple: +
       - name: Marshes
         hint: crowns in marshes times number of linked marsh tiles
         colour: C08B62
         default: true
+        special:
+          variables:
+            - Tiles
+            - Crowns
+          # Reverse Polish Notation of: A * B
+          calculation: AB*
+          # Ask multiple times and add the result together
+          multiple: +
       - name: Mountains
         hint: crowns in mountains times number of linked mountain tiles
         colour: 3A1828
         default: true
+        special:
+          variables:
+            - Tiles
+            - Crowns
+          # Reverse Polish Notation of: A * B
+          calculation: AB*
+          # Ask multiple times and add the result together
+          multiple: +
       - name: Towns
-        hint: crowns in twons times number of linked town tiles
+        hint: crowns in towns times number of linked town tiles
         colour: E42E24
         default: false
+        special:
+          variables:
+            - Tiles
+            - Crowns
+          # Reverse Polish Notation of: A * B
+          calculation: AB*
+          # Ask multiple times and add the result together
+          multiple: +
       - name: Territories
-        hint: points for buildings that has multipliers for number of separate territories
+        hint: points for buildings that have multipliers for number of separate territories
         colour: E42E24
         default: false
+        special:
+          variables:
+            - Building 1
+            - Building 2
+            - Building 3
+            - Building 4
+          # Reverse Polish Notation of: A + B + C + D
+          calculation: AB+C+D+
       - name: Towers
         hint: points for buildings that score towers
         colour: E42E24
@@ -163,31 +227,37 @@ games:
         colour: 6495ED
         default: true
       - name: Metropolis
-        hint: final-scoring tile - the metropolis in the upper left of your board if connected by both tunnels
-        colour: FF7F50
+        hint: final-scoring tiles - the brown metropolis in the upper left of your board if connected by both tunnels and bonus brown metropolis if any
+        colour: 993300
         default: true
+        special:
+          variables:
+            - Brown metropolis
+            - Bonus brown metropolis
+          # Reverse Polish Notation of: A + B
+          calculation: AB+
       - name: Cards
-        hint: end-scoring cards - cards marked with the stopwatch symbol
+        hint: final-scoring cards - cards marked with the stopwatch symbol
         colour: F0FFFF
         default: true
         special:
           variables:
-            - Card 1
-            - Card 2
-            - Card 3
-            - Card 4
+            - Final score card 1
+            - Final score card 2
+            - Final score card 3
+            - Final score card 4
           # Reverse Polish Notation of: A + B + C + D
           calculation: AB+C+D+
       - name: Cities
-        hint: scoring your netowrk - connected cities with different types of buildings
+        hint: scoring your network - connected cities with different types of buildings
         colour: 8B008B
         default: true
         special:
           variables:
-            - City
-            - City 1 type building
-            - City 2 types building
-            - City 3 types building
+            - Cities no buildings
+            - Cities 1 type building
+            - Cities 2 types building
+            - Cities 3 types building
           # Reverse Polish Notation of: A*2 + B*3 + C*4 + D*6
           calculation: A2*B3*+C4*+D6*+
       - name: Resources
@@ -197,8 +267,8 @@ games:
         special:
           variables:
             - Kelp
-            - Research
             - Steelplast
+            - Science
             - Biomatter
             - Credits
           # Reverse Polish Notation of: (D*2 + A + B + C + E) / 4

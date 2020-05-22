@@ -41,7 +41,7 @@
             <default>true</default>
             <special>
                 <variables>Coins</variables>
-                <variables>Debt</variables>
+                <variables>Debt tokens</variables>
                 <calculation>A3/B-</calculation>
             </special>
         </tracks>
@@ -80,6 +80,13 @@
             <colour>902796</colour>
             <hint>score for all purple guild building cards</hint>
             <default>true</default>
+            <special>
+                <variables>Guild 1</variables>
+                <variables>Guild 2</variables>
+                <variables>Guild 3</variables>
+                <variables>Guild 4</variables>
+                <calculation>AB+C+D+</calculation>
+            </special>
         </tracks>
         <tracks>
             <name>Leaders</name>
@@ -132,43 +139,86 @@
             <hint>crowns in forests times number of linked forest tiles</hint>
             <colour>3D7C36</colour>
             <default>true</default>
+            <special>
+                <variables>Tiles</variables>
+                <variables>Crowns</variables>
+                <calculation>AB*</calculation>
+                <multiple>+</multiple>
+            </special>
         </tracks>
         <tracks>
             <name>Lakes</name>
             <hint>crowns in lakes times number of linked lake tiles</hint>
             <colour>207DF5</colour>
             <default>true</default>
+            <special>
+                <variables>Tiles</variables>
+                <variables>Crowns</variables>
+                <calculation>AB*</calculation>
+                <multiple>+</multiple>
+            </special>
         </tracks>
         <tracks>
             <name>Prairies</name>
             <hint>crowns in prairies times number of linked prairie tiles</hint>
             <colour>90CC17</colour>
             <default>true</default>
+            <special>
+                <variables>Tiles</variables>
+                <variables>Crowns</variables>
+                <calculation>AB*</calculation>
+                <multiple>+</multiple>
+            </special>
         </tracks>
         <tracks>
             <name>Marshes</name>
             <hint>crowns in marshes times number of linked marsh tiles</hint>
             <colour>C08B62</colour>
             <default>true</default>
+            <special>
+                <variables>Tiles</variables>
+                <variables>Crowns</variables>
+                <calculation>AB*</calculation>
+                <multiple>+</multiple>
+            </special>
         </tracks>
         <tracks>
             <name>Mountains</name>
             <hint>crowns in mountains times number of linked mountain tiles</hint>
             <colour>3A1828</colour>
             <default>true</default>
+            <special>
+                <variables>Tiles</variables>
+                <variables>Crowns</variables>
+                <calculation>AB*</calculation>
+                <multiple>+</multiple>
+            </special>
         </tracks>
         <tracks>
             <name>Towns</name>
-            <hint>crowns in twons times number of linked town tiles</hint>
+            <hint>crowns in towns times number of linked town tiles</hint>
             <colour>E42E24</colour>
             <default>false</default>
+            <special>
+                <variables>Tiles</variables>
+                <variables>Crowns</variables>
+                <calculation>AB*</calculation>
+                <multiple>+</multiple>
+            </special>
         </tracks>
         <tracks>
             <name>Territories</name>
-            <hint>points for buildings that has multipliers for number of separate territories
+            <hint>points for buildings that have multipliers for number of separate territories
             </hint>
             <colour>E42E24</colour>
             <default>false</default>
+            <special>
+                <variables>Building 1</variables>
+                <variables>Building 2</variables>
+                <variables>Building 3</variables>
+                <variables>Building 4</variables>
+                <calculation>AB+C+D+</calculation>
+            </special>
         </tracks>
         <tracks>
             <name>Towers</name>
@@ -198,35 +248,40 @@
         </tracks>
         <tracks>
             <name>Metropolis</name>
-            <hint>final-scoring tile - the metropolis in the upper left of your board if connected
-                by both tunnels
+            <hint>final-scoring tiles - the brown metropolis in the upper left of your board if
+                connected by both tunnels and bonus brown metropolis if any
             </hint>
-            <colour>FF7F50</colour>
+            <colour>993300</colour>
             <default>true</default>
+            <special>
+                <variables>Brown metropolis</variables>
+                <variables>Bonus brown metropolis</variables>
+                <calculation>AB+</calculation>
+            </special>
         </tracks>
         <tracks>
             <name>Cards</name>
-            <hint>end-scoring cards - cards marked with the stopwatch symbol</hint>
+            <hint>final-scoring cards - cards marked with the stopwatch symbol</hint>
             <colour>F0FFFF</colour>
             <default>true</default>
             <special>
-                <variables>Card 1</variables>
-                <variables>Card 2</variables>
-                <variables>Card 3</variables>
-                <variables>Card 4</variables>
+                <variables>Final score card 1</variables>
+                <variables>Final score card 2</variables>
+                <variables>Final score card 3</variables>
+                <variables>Final score card 4</variables>
                 <calculation>AB+C+D+</calculation>
             </special>
         </tracks>
         <tracks>
             <name>Cities</name>
-            <hint>scoring your netowrk - connected cities with different types of buildings</hint>
+            <hint>scoring your network - connected cities with different types of buildings</hint>
             <colour>8B008B</colour>
             <default>true</default>
             <special>
-                <variables>City</variables>
-                <variables>City 1 type building</variables>
-                <variables>City 2 types building</variables>
-                <variables>City 3 types building</variables>
+                <variables>Cities no buildings</variables>
+                <variables>Cities 1 type building</variables>
+                <variables>Cities 2 types building</variables>
+                <variables>Cities 3 types building</variables>
                 <calculation>A2*B3*+C4*+D6*+</calculation>
             </special>
         </tracks>
@@ -238,8 +293,8 @@
             <default>true</default>
             <special>
                 <variables>Kelp</variables>
-                <variables>Research</variables>
                 <variables>Steelplast</variables>
+                <variables>Science</variables>
                 <variables>Biomatter</variables>
                 <variables>Credits</variables>
                 <calculation>D2*A+B+C+E+4/</calculation>
