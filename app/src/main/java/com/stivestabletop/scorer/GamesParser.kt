@@ -170,10 +170,10 @@ class GamesParser(xmlconfig: InputStream) {
         if (result.length == 6) {
             ok = true
             for (char in result.asSequence()) {
-                when (char) {
-                    in '0'..'9' -> ok = true
-                    in 'A'..'F' -> ok = true
-                    else -> ok = false
+                ok = when (char) {
+                    in '0'..'9' -> true
+                    in 'A'..'F' -> true
+                    else -> false
                 }
                 if (!ok) break
             }
@@ -235,18 +235,21 @@ class GamesParser(xmlconfig: InputStream) {
     @Throws(IOException::class, XmlPullParserException::class)
     private fun readCalculation(parser: XmlPullParser): String {
         parser.require(XmlPullParser.START_TAG, ns, "calculation")
-        val result = readText(parser)
+        var result = readText(parser)
         // Very simple check for invalid chars
         var ok: Boolean
         for (char in result.asSequence()) {
-            when (char) {
-                in '0'..'9' -> ok = true
-                in 'A'..'Z' -> ok = true
-                in "+-*/nx" -> ok = true
-                else -> ok = false
+            ok = when (char) {
+                in '0'..'9' -> true
+                in 'A'..'Z' -> true
+                in "+-*/nx" -> true
+                else -> false
             }
-            if (!ok)
+            if (!ok) {
                 Log.e(TAG, "Found invalid character '$char' in calculation: $result")
+                result = ""
+                break
+            }
         }
         parser.require(XmlPullParser.END_TAG, ns, "calculation")
         return result
@@ -255,7 +258,14 @@ class GamesParser(xmlconfig: InputStream) {
     @Throws(IOException::class, XmlPullParserException::class)
     private fun readMultiple(parser: XmlPullParser): String {
         parser.require(XmlPullParser.START_TAG, ns, "multiple")
-        val result = readText(parser)
+        var result = readText(parser)
+        if (result != "+") {
+            Log.e(
+                TAG,
+                "Found invalid multiple operation '$result', only '+' is supported by multiple"
+            )
+            result = ""
+        }
         parser.require(XmlPullParser.END_TAG, ns, "multiple")
         return result
     }

@@ -1,5 +1,6 @@
 package com.stivestabletop.scorer
 
+import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.Context
 import android.content.DialogInterface
@@ -72,6 +73,7 @@ class TrackFragment : Fragment() {
         }
     }
 
+    @SuppressLint("ResourceType")
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -137,20 +139,24 @@ class TrackFragment : Fragment() {
                     val move_focus = layoutview.findViewById<EditText>(1)
                     move_focus.requestFocus()
                     // Show the dialogs for this score track, one player at a time
+
+                    // Create dialogs in reverse so that we can link them to each other on dismiss
+                    var nextDialog: AlertDialog? = null
                     for (num in players.size downTo 1) {
-                        // TODO: Currently this displays ALL the dialogs on top of each other
-                        // find out how to do a chain of dialogs (that can be broken by cancel!)
                         val ev = layoutview.findViewById<EditText>(num)
-                        specialDialog(
+                        val dialog = specialDialog(
                             ev,
                             players[num - 1],
                             tname,
                             thint,
                             calculation,
                             variables,
-                            multiple
+                            multiple,
+                            nextDialog
                         )
+                        nextDialog = dialog
                     }
+                    nextDialog?.show()
                 }
             })
         }
@@ -202,15 +208,17 @@ class TrackFragment : Fragment() {
             view.setOnLongClickListener(View.OnLongClickListener { v ->
                 if (v is EditText) {
                     v.requestFocus()
-                    specialDialog(
+                    val dialog = specialDialog(
                         v,
                         playername,
                         trackname,
                         trackhint,
                         calculation,
                         variables,
-                        multiple
+                        multiple,
+                        null
                     )
+                    dialog.show()
                 }
                 true
             })
@@ -246,8 +254,9 @@ class TrackFragment : Fragment() {
         trackhint: String,
         calculation: String,
         variables: Array<String>,
-        multiple: String
-    ) {
+        multiple: String,
+        nextdialog: AlertDialog?
+    ): AlertDialog {
         val builder = AlertDialog.Builder(scoreview.context)
         builder.setTitle("$playername - $trackname")
 
@@ -304,8 +313,8 @@ class TrackFragment : Fragment() {
                 lay.addView(text)
                 val entry = getScoreEntry(scoreview.context)
                 entry.layoutParams = LAYOUT_PARAMS_SPECIAL_VALUE
-                // Set an incremental id from 0 for each variable
-                entry.id = idx
+                // Set an incremental id from 1 for each variable (zero is invalid)
+                entry.id = idx + 1
                 entry.addTextChangedListener(object : TextWatcher {
                     override fun afterTextChanged(s: Editable) {}
                     override fun beforeTextChanged(
@@ -321,7 +330,7 @@ class TrackFragment : Fragment() {
                         // Look for all the other variables in this layout
                         val vars = mutableListOf<Int>()
                         for (id in variables.indices) {
-                            val ev = layout.findViewById<EditText>(id)
+                            val ev = layout.findViewById<EditText>(id + 1)
                             val textentry = ev.text.toString()
                             val value = try {
                                 textentry.toInt()
@@ -370,13 +379,19 @@ class TrackFragment : Fragment() {
         builder.setNegativeButton(R.string.skip, null)
 
         val alert = builder.create()
-        // Focus on first entry on show
         alert.setOnShowListener( DialogInterface.OnShowListener { dialog ->
+            // Focus on first entry on show
             if (first_entry != null) {
                 first_entry.requestFocus()
             }
         })
-        // Make last entry action next dimiss the dialog
+        alert.setOnDismissListener(DialogInterface.OnDismissListener { dialog ->
+            // Show next dialog if there is one
+            if (nextdialog != null) {
+                nextdialog.show()
+            }
+        })
+        // Make last entry's "next" action dismiss the dialog
         if (last_entry != null) {
             last_entry.setOnEditorActionListener { _, actionId, _ ->
                 return@setOnEditorActionListener when (actionId) {
@@ -391,11 +406,12 @@ class TrackFragment : Fragment() {
             }
         }
 
-        alert.show()
         // FIX: to show soft keyboard all the time for the dialog
         val window = alert.window
         window?.clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM)
         window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
+
+        return alert
     }
 
 
