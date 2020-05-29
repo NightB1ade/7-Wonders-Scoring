@@ -39,7 +39,7 @@ games:
           # Reverse Polish Notation of: A - B
           calculation: AB-
       # ----------------------------
-      - name: Coins
+      - name: Coins / Debt
         hint: scoring 1 point for every three coins and -1 point for debt tokens
         colour: 9B7A19
         default: true
@@ -60,6 +60,11 @@ games:
         hint: score for all blue civil building cards
         default: true
       # ----------------------------
+      - name: Commercial
+        colour: FFEB29
+        hint: score for all yellow commerce building cards
+        default: true
+      # ----------------------------
       - name: Science
         colour: 429F4D
         hint: score for the combination of science cards
@@ -71,11 +76,6 @@ games:
             - Cogs
           # (Extra) Reverse Polish Notation of: A*A + B*B + C*C + min(A,min(B,C))*7
           calculation: AA*BB*+CC*+BCnAn7*+
-      # ----------------------------
-      - name: Commercial
-        colour: FFEB29
-        hint: score for all yellow commerce building cards
-        default: true
       # ----------------------------
       - name: Guilds
         colour: 902796
@@ -306,9 +306,9 @@ games:
     players:
       - Board...
       - Coal Mine
+      - Gas Field
       - Limestone
       - Mineral Vein
-      - Gas Field
       - Oil Well
       - Rainforest
     tracks:
@@ -344,7 +344,7 @@ games:
         special:
           variables:
             - Residential tiles
-          # Reverse Polish Notation of: lookup(A)
+          # (Extra) Reverse Polish Notation of: lookup(A)
           calculation: Al
           # Integer look up table starting from 0
           lookup:
@@ -402,6 +402,7 @@ games:
         special:
           variables:
             - Residential tiles
+          # (Extra) Reverse Polish Notation of: lookup(A)
           calculation: Al
           # Integer look up table starting from 0
           lookup:
@@ -418,6 +419,7 @@ games:
         special:
           variables:
             - Power tiles
+          # (Extra) Reverse Polish Notation of: lookup(A)
           calculation: Al
           # Integer look up table starting from 0
           lookup:

@@ -35,7 +35,7 @@
             </special>
         </tracks>
         <tracks>
-            <name>Coins</name>
+            <name>Coins / Debt</name>
             <hint>scoring 1 point for every three coins and -1 point for debt tokens</hint>
             <colour>9B7A19</colour>
             <default>true</default>
@@ -58,6 +58,12 @@
             <default>true</default>
         </tracks>
         <tracks>
+            <name>Commercial</name>
+            <colour>FFEB29</colour>
+            <hint>score for all yellow commerce building cards</hint>
+            <default>true</default>
+        </tracks>
+        <tracks>
             <name>Science</name>
             <colour>429F4D</colour>
             <hint>score for the combination of science cards</hint>
@@ -68,12 +74,6 @@
                 <variables>Cogs</variables>
                 <calculation>AA*BB*+CC*+BCnAn7*+</calculation>
             </special>
-        </tracks>
-        <tracks>
-            <name>Commercial</name>
-            <colour>FFEB29</colour>
-            <hint>score for all yellow commerce building cards</hint>
-            <default>true</default>
         </tracks>
         <tracks>
             <name>Guilds</name>
@@ -305,9 +305,9 @@
         <name>Neom</name>
         <players>Board...</players>
         <players>Coal Mine</players>
+        <players>Gas Field</players>
         <players>Limestone</players>
         <players>Mineral Vein</players>
-        <players>Gas Field</players>
         <players>Oil Well</players>
         <players>Rainforest</players>
         <tracks>

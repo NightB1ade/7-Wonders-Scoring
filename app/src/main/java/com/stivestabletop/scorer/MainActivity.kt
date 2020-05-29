@@ -60,7 +60,7 @@ class MainActivity : AppCompatActivity() {
         }
         val data = supportFragmentManager.findFragmentByTag(PLAYER_LIST)
 
-        // Set up player list from any saved fragment
+        // Set up player name/type list from any saved fragment
         if (savedInstanceState != null) {
             // Re-use store of players to re-create view
             val view = findViewById<LinearLayout>(R.id.playersLayout)
@@ -81,20 +81,39 @@ class MainActivity : AppCompatActivity() {
         }
 
         // Set up games spinner
-        val view = findViewById<Spinner>(R.id.spinnerGame)
+        val gameSpinner = findViewById<Spinner>(R.id.spinnerGame)
         val adapter = ArrayAdapter(
             this, R.layout.support_simple_spinner_dropdown_item,
             gamesconfig.getGamesList()
         )
-        view.adapter = adapter
-        if (data is PlayerDataFragment && !data.gamename.isBlank()) {
-            // Set up chosen game
-            view.setSelection(adapter.getPosition(data.gamename))
-            setupPlayerTypes(applicationContext, gamesconfig.getPlayersList(data.gamename))
+        gameSpinner.adapter = adapter
+        if (data is PlayerDataFragment && data.gamename.isNotBlank()) {
+            // Set up previously chosen game
+            gameSpinner.setSelection(adapter.getPosition(data.gamename))
+            setupPlayerTypes(
+                applicationContext,
+                gamesconfig.getPlayersList(data.gamename),
+                data.playertypes
+            )
+        }
+
+        // Add listener to always show player type drop down
+        findViewById<AutoCompleteTextView>(R.id.autoPlayer).setOnFocusChangeListener { view, hasFocus ->
+            if (hasFocus && view is AutoCompleteTextView) {
+                @Suppress("NAME_SHADOWING") val data =
+                    supportFragmentManager.findFragmentByTag(PLAYER_LIST)
+                if (data is PlayerDataFragment)
+                    setupPlayerTypes(
+                        applicationContext,
+                        gamesconfig.getPlayersList(data.gamename),
+                        data.playertypes
+                    )
+                view.showDropDown()
+            }
         }
 
         // Set up listener for game change
-        view.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+        gameSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
                 parent: AdapterView<*>,
                 v: View?,
@@ -117,6 +136,7 @@ class MainActivity : AppCompatActivity() {
                                     setPositiveButton(
                                         android.R.string.ok,
                                         DialogInterface.OnClickListener { _, _ ->
+                                            // Change game and clear all data
                                             data.gamename = gamename
                                             clearPlayers()
                                             setupPlayerTypes(
@@ -128,7 +148,7 @@ class MainActivity : AppCompatActivity() {
                                         android.R.string.cancel,
                                         DialogInterface.OnClickListener { _, _ ->
                                             // Reset selection
-                                            view.setSelection(adapter.getPosition(data.gamename))
+                                            gameSpinner.setSelection(adapter.getPosition(data.gamename))
                                         })
                                     setMessage(R.string.game_change)
                                 }
@@ -139,7 +159,8 @@ class MainActivity : AppCompatActivity() {
                                 data.gamename = gamename
                                 setupPlayerTypes(
                                     parent.context,
-                                    gamesconfig.getPlayersList(gamename)
+                                    gamesconfig.getPlayersList(gamename),
+                                    data.playertypes
                                 )
                             }
                         }
@@ -186,6 +207,18 @@ class MainActivity : AppCompatActivity() {
         imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY)
     }
 
+    // FIX: for keyboard not showing when the score activity finishes (rather than back)
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+        if (hasFocus) {
+            val imm = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+            imm.toggleSoftInput(
+                InputMethodManager.SHOW_FORCED,
+                InputMethodManager.HIDE_IMPLICIT_ONLY
+            )
+        }
+    }
+
     // FIX: Part of keyboard fix - see onResume
     override fun onPause() {
         super.onPause()
@@ -193,15 +226,20 @@ class MainActivity : AppCompatActivity() {
         imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0)
     }
 
-    // Set up the player type list
-    fun setupPlayerTypes(context: Context, list: List<String>) {
+    // Set up the player type list, only show those not yet selected
+    fun setupPlayerTypes(
+        context: Context,
+        list: List<String>,
+        selected: List<String> = emptyList()
+    ) {
         val view = findViewById<AutoCompleteTextView>(R.id.autoPlayer)
         view.completionHint = list[0]
         view.hint = list[0]
+        val show = list.filterNot { it in selected }
         val adapter = ArrayAdapter(
             context,
             android.R.layout.simple_dropdown_item_1line,
-            list.subList(1, list.lastIndex + 1)
+            show.subList(1, show.lastIndex + 1)
         )
         view.setAdapter(adapter)
     }

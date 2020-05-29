@@ -122,6 +122,8 @@ class SpecialCalc(
 
     private fun performLookup(): Boolean {
         if (lookup != null && lookup.isNotEmpty()) {
+            if (sizeStack() < 1)
+                return false
             val x = popStack()
             if (x < 0) {
                 // Can't perform negative lookups

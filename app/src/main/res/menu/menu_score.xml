@@ -4,4 +4,10 @@
     <item
         android:id="@+id/menu_config"
         android:title="@string/menu_config" />
+    <item
+        android:id="@+id/menu_clear"
+        android:title="@string/menu_clear" />
+    <item
+        android:id="@+id/menu_return"
+        android:title="@string/menu_return" />
 </menu>

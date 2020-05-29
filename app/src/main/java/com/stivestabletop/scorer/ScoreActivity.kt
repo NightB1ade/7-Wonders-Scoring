@@ -652,6 +652,14 @@ class ScoreActivity : AppCompatActivity() {
                 doConfigure()
                 true
             }
+            R.id.menu_clear -> {
+                doClear()
+                true
+            }
+            R.id.menu_return -> {
+                finish()
+                true
+            }
             else -> super.onOptionsItemSelected(item)
         }
     }
@@ -692,6 +700,27 @@ class ScoreActivity : AppCompatActivity() {
             // Show the configuration dialog
             builder.show()
         }
+    }
+
+    private fun doClear() {
+        // List of track fragments
+        for (fragment in supportFragmentManager.fragments) {
+            // Ignore the total track
+            if (fragment is TrackFragment) {
+                // Find the score layout in the fragment
+                val view = fragment.view
+                if (view != null && view.id != R.id.total_track) {
+                    val layout = view.findViewById<LinearLayout>(R.id.scoreLayout)
+                    val children = layout?.children
+                    if (children != null) {
+                        // Look at the edit text boxes in the fragment
+                        for (child in children) {
+                            if (child is EditText) child.setText("")
+                        } // end for children
+                    }
+                }
+            }
+        } // end for fragments
     }
 
     // Player name view box

@@ -2,34 +2,42 @@
 
 ## Version 13
 
-* Simple app prototype with three games - 7 Wonders, King/Queendomino & Underwater cities
-* First screen is game chooser and player name/type entry - list of players names built and shown
-* Players can be cleared via menu
+* Simple board game scoring app which supports the following games:
+  * 7 Wonders
+  * Kingdomino & Queendomino
+  * Underwater cities
+  * Neom
+ 
+* First screen is game chooser and player name/type entry
+  * List of players names recorded and shown
+  * Players/game can be cleared via menu
 * Second screen is dynamic to number of players, and sets up score tracks based on chosen game
-* Tracks can be configured in second screen (hide/show)
-* Totals are tracked dynamically
-* Button press on track name opens helper dialogs for each player inc special calc as needed
-* Long press on score opens helper dialog including special calc as needed
-* Helper dialog supports sub-total for games that have multiple scores - such as King/Queendomino
-* Back button will take you back to player entry
+  * Tracks can be configured in second screen (hide/show)
+  * Totals are tracked dynamically
+  * Button press on track name opens helper dialogs for each player inc special calc as needed
+  * Long press on a single score opens helper dialog including special calc as needed
+  * Helper dialog supports sub-total for games that have multiple scores - such as King/Queendomino
+  * Clear scores menu for allowing second game without returning to game chooser
+  * Back button or Game select menu will take you back to player entry
 
 ## Next steps
 Current brain dump - also see TODOs in code
 
 Player entry:
-- [ ] set first letter as capital on player name/type
-- [ ] reduce player type list once something chosen (reset on clear)
+- [x] set first letter as capital on player name/type
+- [x] reduce player type list once something chosen (reset on clear)
+- [x] change NEXT button to ADD
+- [x] show player type on focus, rather than after first key?
 - [ ] make player name recording area prettier/better...
 - [ ] player name editing after entry?
-- [ ] show player type on focus, rather than after first key?
 
 Score entry:
+- [x] menu entry to return to first screen
+- [x] clear scores menu
 - [ ] Set focus on NEXT row/box if special dialog invoked
-- [ ] menu entry to return to first screen
 - [ ] menu entry for help about invoking special dialog?
 - [ ] tool tip text on track buttons?
 - [ ] dialog at end declaring winner on final score entry?
-- [ ] clear scores menu
 - [ ] calculator dialog
 
 Other:
