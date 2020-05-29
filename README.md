@@ -1,6 +1,6 @@
 # BGG Scorer
 
-## Version 12
+## Version 13
 
 * Simple app prototype with three games - 7 Wonders, King/Queendomino & Underwater cities
 * First screen is game chooser and player name/type entry - list of players names built and shown
@@ -17,20 +17,26 @@
 Current brain dump - also see TODOs in code
 
 Player entry:
+- [ ] set first letter as capital on player name/type
 - [ ] reduce player type list once something chosen (reset on clear)
 - [ ] make player name recording area prettier/better...
 - [ ] player name editing after entry?
+- [ ] show player type on focus, rather than after first key?
 
 Score entry:
+- [ ] Set focus on NEXT row/box if special dialog invoked
+- [ ] menu entry to return to first screen
+- [ ] menu entry for help about invoking special dialog?
 - [ ] tool tip text on track buttons?
 - [ ] dialog at end declaring winner on final score entry?
-- [x] add MULTIPLE feature to special dialog
-- [ ] Set focus on NEXT row/box if special dialog invoked
+- [ ] clear scores menu
+- [ ] calculator dialog
 
 Other:
 - [ ] make the config strings be internationalized via dynamic lookup on load???
 
 Done:
+- [x] add MULTIPLE feature to special dialog
 - [x] BUG: Make sure totals updated after special dialog
 - [x] BUG: add auto-focus + keyboard on the special dialog
 - [x] BUG: on return from score activity keyboard entry is NOT displayed!

@@ -4,10 +4,16 @@ import android.util.Log
 
 private const val TAG = "SpecialCalc"
 
-class SpecialCalc(val RPN: String) {
-    // RPN is the reverse polish notation calculation in a string
-    // Example: 2A* = 2 * A
-    // where A is a variable (variables should be incremental capital alpha chars)
+class SpecialCalc(
+    private val RPN: String,
+    private val lookup: IntArray? = null,
+    private val increment: Int = 0
+) {
+    // RPN - is the reverse polish notation calculation in a string
+    //      Example: 2A* = 2 * A
+    //      where A is a variable (variables should be incremental capital alpha chars)
+    // lookup - is an integer lookup array (if needed as part of the RPN)
+    // increment - is the out of bounds increment for the lookup
 
     // Stack for data
     private var datastack = mutableListOf<Int>()
@@ -33,15 +39,24 @@ class SpecialCalc(val RPN: String) {
                     // Push any number we have been collecting
                     pushNumStr(numstr.toString())
                     numstr.clear()
+
                     // Perform the chosen operation
-                    val ok = performOp(notation)
-                    if (!ok) {
-                        val stack = sizeStack()
-                        Log.e(
-                            TAG,
-                            "Unknown op '$notation' or Not enough stack '$stack' - setting calculation to zero"
-                        )
-                        return 0
+                    if (notation == 'l') {
+                        val ok = performLookup()
+                        if (!ok) {
+                            Log.e(TAG, "Failed lookup - setting calculation to zero")
+                            return 0
+                        }
+                    } else {
+                        val ok = performOp(notation)
+                        if (!ok) {
+                            val stack = sizeStack()
+                            Log.e(
+                                TAG,
+                                "Unknown op '$notation' or Not enough stack '$stack' - setting calculation to zero"
+                            )
+                            return 0
+                        }
                     }
                 }
             }
@@ -89,14 +104,13 @@ class SpecialCalc(val RPN: String) {
             return false
         val y = popStack()
         val x = popStack()
-        var answer = 0
-        when (operation) {
-            '+' -> answer = x + y
-            '-' -> answer = x - y
-            '*' -> answer = x * y
-            '/' -> answer = x / y
-            'n' -> answer = if (x < y) x else y // Minimum
-            'x' -> answer = if (x > y) x else y // Maximum
+        val answer = when (operation) {
+            '+' -> x + y
+            '-' -> x - y
+            '*' -> x * y
+            '/' -> x / y
+            'n' -> if (x < y) x else y // Minimum
+            'x' -> if (x > y) x else y // Maximum
             else -> {
                 assert(false)
                 return false
@@ -104,6 +118,30 @@ class SpecialCalc(val RPN: String) {
         }
         pushStack(answer)
         return true
+    }
+
+    private fun performLookup(): Boolean {
+        if (lookup != null && lookup.isNotEmpty()) {
+            val x = popStack()
+            if (x < 0) {
+                // Can't perform negative lookups
+                return false
+            }
+
+            if (x <= lookup.lastIndex) {
+                // Within the look up table
+                pushStack(lookup[x])
+            } else {
+                // Calculate how far beyond the look up we are are multiply by the increment
+                var value = lookup[lookup.lastIndex]
+                val diff = x - lookup.lastIndex
+                value += diff * increment
+                pushStack(value)
+            }
+            return true
+        } else {
+            return false
+        }
     }
 }
 

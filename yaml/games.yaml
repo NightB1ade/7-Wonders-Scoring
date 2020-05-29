@@ -2,6 +2,7 @@
 # Note: It can sometimes get the colours wrong e.g. 009900 gets converted to 0
 
 games:
+  # ----------------------------------------------------------------------------------------------
   - name: 7 wonders
     players:
       - City...
@@ -26,6 +27,7 @@ games:
       - The Great Wall
       - Venezia
     tracks:
+      # ----------------------------
       - name: Military
         colour: E62E25
         hint: score for all military tokens including losses
@@ -36,6 +38,7 @@ games:
             - Losses
           # Reverse Polish Notation of: A - B
           calculation: AB-
+      # ----------------------------
       - name: Coins
         hint: scoring 1 point for every three coins and -1 point for debt tokens
         colour: 9B7A19
@@ -46,14 +49,17 @@ games:
             - Debt tokens
           # Reverse Polish Notation of: (A/3) - B
           calculation: A3/B-
+      # ----------------------------
       - name: Wonder
         colour: F5B463
         hint: score for built stages of the wonder
         default: true
+      # ----------------------------
       - name: Civilian
         colour: 0B4FD9
         hint: score for all blue civil building cards
         default: true
+      # ----------------------------
       - name: Science
         colour: 429F4D
         hint: score for the combination of science cards
@@ -65,10 +71,12 @@ games:
             - Cogs
           # (Extra) Reverse Polish Notation of: A*A + B*B + C*C + min(A,min(B,C))*7
           calculation: AA*BB*+CC*+BCnAn7*+
+      # ----------------------------
       - name: Commercial
         colour: FFEB29
         hint: score for all yellow commerce building cards
         default: true
+      # ----------------------------
       - name: Guilds
         colour: 902796
         hint: score for all purple guild building cards
@@ -81,14 +89,17 @@ games:
             - Guild 4
           # Reverse Polish Notation of: A + B + C + D
           calculation: AB+C+D+
+      # ----------------------------
       - name: Leaders
         colour: FFFFFF
         hint: score for leader cards
         default: false
+      # ----------------------------
       - name: Cities
         colour: 363638
         hint: score for black city building cards
         default: false
+  # ----------------------------------------------------------------------------------------------
   - name: King/Queendomino
     players:
       - Colour...
@@ -101,6 +112,7 @@ games:
       - White
       - Yellow
     tracks:
+      # ----------------------------
       - name: Coins
         hint: scoring 1 point for every three coins
         colour: 996600
@@ -110,6 +122,7 @@ games:
             - Coins
           # Reverse Polish Notation of: A / 3
           calculation: A3/
+      # ----------------------------
       - name: Fields
         hint: crowns in fields times number of linked field tiles
         colour: FDDC29
@@ -122,6 +135,7 @@ games:
           calculation: AB*
           # Ask multiple times and add the result together
           multiple: +
+      # ----------------------------
       - name: Forests
         hint: crowns in forests times number of linked forest tiles
         colour: 3D7C36
@@ -134,6 +148,7 @@ games:
           calculation: AB*
           # Ask multiple times and add the result together
           multiple: +
+      # ----------------------------
       - name: Lakes
         hint: crowns in lakes times number of linked lake tiles
         colour: 207DF5
@@ -146,6 +161,7 @@ games:
           calculation: AB*
           # Ask multiple times and add the result together
           multiple: +
+      # ----------------------------
       - name: Prairies
         hint: crowns in prairies times number of linked prairie tiles
         colour: 90CC17
@@ -158,6 +174,7 @@ games:
           calculation: AB*
           # Ask multiple times and add the result together
           multiple: +
+      # ----------------------------
       - name: Marshes
         hint: crowns in marshes times number of linked marsh tiles
         colour: C08B62
@@ -170,6 +187,7 @@ games:
           calculation: AB*
           # Ask multiple times and add the result together
           multiple: +
+      # ----------------------------
       - name: Mountains
         hint: crowns in mountains times number of linked mountain tiles
         colour: 3A1828
@@ -182,6 +200,7 @@ games:
           calculation: AB*
           # Ask multiple times and add the result together
           multiple: +
+      # ----------------------------
       - name: Towns
         hint: crowns in towns times number of linked town tiles
         colour: E42E24
@@ -194,6 +213,7 @@ games:
           calculation: AB*
           # Ask multiple times and add the result together
           multiple: +
+      # ----------------------------
       - name: Territories
         hint: points for buildings that have multipliers for number of separate territories
         colour: E42E24
@@ -206,14 +226,17 @@ games:
             - Building 4
           # Reverse Polish Notation of: A + B + C + D
           calculation: AB+C+D+
+      # ----------------------------
       - name: Towers
         hint: points for buildings that score towers
         colour: E42E24
         default: false
+      # ----------------------------
       - name: Buildings
         hint: points for buildings that are worth points
         colour: E42E24
         default: false
+  # ----------------------------------------------------------------------------------------------
   - name: Underwater Cities
     players:
       - Colour...
@@ -222,10 +245,12 @@ games:
       - Orange
       - Purple
     tracks:
+      # ----------------------------
       - name: In game
         hint: points acquired before the final scoring at the end of the game
         colour: 6495ED
         default: true
+      # ----------------------------
       - name: Metropolis
         hint: final-scoring tiles - the brown metropolis in the upper left of your board if connected by both tunnels and bonus brown metropolis if any
         colour: 993300
@@ -236,6 +261,7 @@ games:
             - Bonus brown metropolis
           # Reverse Polish Notation of: A + B
           calculation: AB+
+      # ----------------------------
       - name: Cards
         hint: final-scoring cards - cards marked with the stopwatch symbol
         colour: F0FFFF
@@ -248,6 +274,7 @@ games:
             - Final score card 4
           # Reverse Polish Notation of: A + B + C + D
           calculation: AB+C+D+
+      # ----------------------------
       - name: Cities
         hint: scoring your network - connected cities with different types of buildings
         colour: 8B008B
@@ -260,6 +287,7 @@ games:
             - Cities 3 types building
           # Reverse Polish Notation of: A*2 + B*3 + C*4 + D*6
           calculation: A2*B3*+C4*+D6*+
+      # ----------------------------
       - name: Resources
         hint: scoring your resources - conversion into credits and divide by 4 to get points
         colour: 7FFFD4
@@ -273,3 +301,127 @@ games:
             - Credits
           # Reverse Polish Notation of: (D*2 + A + B + C + E) / 4
           calculation: D2*A+B+C+E+4/
+  # ----------------------------------------------------------------------------------------------
+  - name: Neom
+    players:
+      - Board...
+      - Coal Mine
+      - Limestone
+      - Mineral Vein
+      - Gas Field
+      - Oil Well
+      - Rainforest
+    tracks:
+      # ----------------------------
+      - name: Tiles (0-9)
+        hint: scoring for numbered victory points on the tiles - top right corner
+        colour: E65100
+        default: true
+        special:
+          variables:
+            - Residential total
+            - Public total
+          # Reverse Polish Notation of: A + B
+          calculation: AB+
+      # ----------------------------
+      - name: Tiles (?)
+        hint: scoring for question mark victory points on the tiles - top right corner
+        colour: E65100
+        default: true
+        special:
+          variables:
+            - Public 1
+            - Public 2
+            - Public 3
+            - Public 4
+          # Reverse Polish Notation of: A + B + C + D
+          calculation: AB+C+D+
+      # ----------------------------
+      - name: Neighbourhoods
+        hint: scoring for residential tiles directly connected to each other score on the traingular number sequence
+        colour: 9CCC65
+        default: true
+        special:
+          variables:
+            - Residential tiles
+          # Reverse Polish Notation of: lookup(A)
+          calculation: Al
+          # Integer look up table starting from 0
+          lookup:
+            - 0
+            - 1
+            - 3
+            - 6
+            - 10
+            - 15
+            - 21
+            - 28
+            - 36
+          # Additional value for each integer increment that exceeds look up table
+          increment: 4
+          # Ask multiple times and add the result together
+          multiple: +
+      # ----------------------------
+      - name: Goods
+        hint: scoring for number of Goods that your city produces (ignore duplicates)
+        colour: FFF3E0
+        default: true
+        special:
+          variables:
+            - Raw Good
+            - Processed Good
+            - Luxury Good
+          # Reverse Polish Notation of: A + (2*B) + (10*C)
+          calculation: A2B*+10C*+
+      # ----------------------------
+      - name: Money
+        hint: scoring 1 victory point for every 2 money (rounded down)
+        colour: E0F7FA
+        default: true
+        special:
+          variables:
+            - Money
+          # Reverse Polish Notation of: A / 2
+          calculation: A2/
+      # ----------------------------
+      - name: Pollution
+        hint: minus points for each polluting industry adjacent or diagonal to a residential
+        colour: 607D8B
+        default: true
+        special:
+          variables:
+            - Adjacent industry
+            - Diagonal industry
+          # Reverse Polish Notation of: (A*2) + B
+          calculation: A2*B+
+      # ----------------------------
+      - name: Ghost Town
+        hint: minus points for having less than 2 residential tiles
+        colour: F5F5F5
+        default: true
+        special:
+          variables:
+            - Residential tiles
+          calculation: Al
+          # Integer look up table starting from 0
+          lookup:
+            - -10
+            - -4
+            - 0
+          # Additional value for each integer increment that exceeds look up table
+          increment: 0
+      # ----------------------------
+      - name: Power
+        hint: minus points for not having any power tiles
+        colour: FFEE58
+        default: true
+        special:
+          variables:
+            - Power tiles
+          calculation: Al
+          # Integer look up table starting from 0
+          lookup:
+            - -5
+            - 0
+          # Additional value for each integer increment that exceeds look up table
+          increment: 0

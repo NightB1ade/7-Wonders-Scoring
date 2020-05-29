@@ -220,7 +220,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     // Set up the next player text based on the number of players so far
-    fun setNextPlayer(players: Int) {
+    private fun setNextPlayer(players: Int) {
         val autoText = findViewById<AutoCompleteTextView>(R.id.autoPlayer)
         autoText.setText("")
         val editText = findViewById<EditText>(R.id.editPlayer)
@@ -231,16 +231,16 @@ class MainActivity : AppCompatActivity() {
     }
 
     // Get a simple player name/type textview box
-    fun getPlayerText(name: String, type: String): TextView {
+    private fun getPlayerText(name: String, type: String): TextView {
         val text = if (type.isBlank()) name else "$name is $type"
-        val tv_dynamic = TextView(this)
-        tv_dynamic.textSize = 20f
-        tv_dynamic.text = text
-        return tv_dynamic
+        val tv = TextView(this)
+        tv.textSize = 20f
+        tv.text = text
+        return tv
     }
 
     // Enable done button if we have at least one player
-    fun enableDone() {
+    private fun enableDone() {
         val doneButton = findViewById<Button>(R.id.buttonDone)
         val data = supportFragmentManager.findFragmentByTag(PLAYER_LIST)
         if (data is PlayerDataFragment) {
@@ -256,11 +256,10 @@ class MainActivity : AppCompatActivity() {
     fun addPlayer(view: View) {
         val editText = findViewById<EditText>(R.id.editPlayer)
         val playername = editText.text.toString()
-        val autoText: AutoCompleteTextView
-        if (view is AutoCompleteTextView) {
-            autoText = view
+        val autoText: AutoCompleteTextView = if (view is AutoCompleteTextView) {
+            view
         } else {
-            autoText = findViewById<AutoCompleteTextView>(R.id.autoPlayer)
+            findViewById(R.id.autoPlayer)
         }
         var playertype = autoText.text.toString()
         // Check for no selected type
@@ -278,7 +277,7 @@ class MainActivity : AppCompatActivity() {
         // add player to layout
         layout?.addView(getPlayerText(playername, playertype))
         // Enable done if we have enough players
-        enableDone()
+        this.enableDone()
     }
 
     // Finished entering players - move onto scoring

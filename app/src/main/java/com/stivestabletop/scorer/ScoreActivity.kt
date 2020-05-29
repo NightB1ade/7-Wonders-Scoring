@@ -67,8 +67,10 @@ class TrackFragment : Fragment() {
                 args.putString("calculation", special.calculation)
                 args.putStringArray("variables", special.variables.toTypedArray())
                 args.putString("multiple", special.multiple)
+                args.putIntArray("lookup", special.lookup.toIntArray())
+                args.putInt("increment", special.increment)
             }
-            f.setArguments(args)
+            f.arguments = args
             return f
         }
     }
@@ -82,29 +84,34 @@ class TrackFragment : Fragment() {
     ): View? {
         val args = arguments
         var players: Array<String> = arrayOf()
-        var tname = ""
-        var tcol = ""
-        var thint = ""
-        var first = false
-        var total = false
-        var calculation = ""
+        var trackName = ""
+        var trackColour = ""
+        var trackHint = ""
+        var trackFirst = false
+        var trackTotal = false
         var variables: Array<String> = arrayOf()
+        var calculator: SpecialCalc? = null
         var multiple = ""
         if (args != null) {
             players = args.getStringArray("players") as Array<String>
-            tname = args.getString("name", "track")
-            tcol = "#" + args.getString("colour", "FFFFFF")
-            thint = args.getString("hint", "enter a points value")
-            first = args.getBoolean("first", false)
-            total = args.getBoolean("total", false)
-            calculation = args.getString("calculation", "")
+            trackName = args.getString("name", "track")
+            trackColour = "#" + args.getString("colour", "FFFFFF")
+            trackHint = args.getString("hint", "enter a points value")
+            trackFirst = args.getBoolean("first", false)
+            trackTotal = args.getBoolean("total", false)
             if (args.containsKey("variables"))
                 variables = args.getStringArray("variables") as Array<String>
             multiple = args.getString("multiple", "")
+            val calculation = args.getString("calculation", "")
+            var lookup: IntArray? = null
+            if (args.containsKey("lookup"))
+                lookup = args.getIntArray("lookup")
+            val increment = args.getInt("increment", 0)
+            calculator = SpecialCalc(calculation, lookup, increment)
         }
         // Create new track fragment
         val track = inflater.inflate(R.layout.fragment_line, container, false)
-        if (total)
+        if (trackTotal)
             track.id = R.id.total_track
 
         // Sort out score boxes
@@ -114,30 +121,30 @@ class TrackFragment : Fragment() {
                 getScoreView(
                     requireContext(),
                     num,
-                    tname,
-                    thint,
+                    trackName,
+                    trackHint,
                     players[num - 1],
-                    calculation,
+                    calculator,
                     variables,
                     multiple,
-                    !total
+                    !trackTotal
                 )
             layoutview?.addView(sv)
-            if (num == 1 && first)
+            if (num == 1 && trackFirst)
                 sv.requestFocus()
         }
 
         // Update the track name/colour
         val nameview = track.findViewById<Button>(R.id.trackName)
-        nameview.text = tname
-        val bgcol = Color.parseColor(tcol)
+        nameview.text = trackName
+        val bgcol = Color.parseColor(trackColour)
         nameview.setBackgroundColor(bgcol)
         nameview.setTextColor(getContrastTextColour(bgcol))
-        if (!total) {
+        if (!trackTotal) {
             nameview.setOnClickListener(View.OnClickListener { v ->
                 if (v is Button) {
-                    val move_focus = layoutview.findViewById<EditText>(1)
-                    move_focus.requestFocus()
+                    val focus = layoutview.findViewById<EditText>(1)
+                    focus.requestFocus()
                     // Show the dialogs for this score track, one player at a time
 
                     // Create dialogs in reverse so that we can link them to each other on dismiss
@@ -147,9 +154,9 @@ class TrackFragment : Fragment() {
                         val dialog = specialDialog(
                             ev,
                             players[num - 1],
-                            tname,
-                            thint,
-                            calculation,
+                            trackName,
+                            trackHint,
+                            calculator,
                             variables,
                             multiple,
                             nextDialog
@@ -170,7 +177,7 @@ class TrackFragment : Fragment() {
     }
 
     // Entry edit text for dialogs or track
-    fun getScoreEntry(context: Context): EditText {
+    private fun getScoreEntry(context: Context): EditText {
         val view = EditText(context)
         // Signed integer numbers only
         view.inputType = InputType.TYPE_CLASS_NUMBER or
@@ -190,17 +197,17 @@ class TrackFragment : Fragment() {
     fun getScoreView(
         context: Context,
         id: Int,
-        trackname: String,
-        trackhint: String,
-        playername: String,
-        calculation: String,
+        trackName: String,
+        trackHint: String,
+        playerName: String,
+        calculator: SpecialCalc?,
         variables: Array<String>,
         multiple: String,
         editable: Boolean
     ): View {
         val view = if (editable) getScoreEntry(context) else TextView(context)
         view.id = id
-        view.tag = trackname
+        view.tag = trackName
         view.textSize = 12f
         view.layoutParams = LAYOUT_PARAMS_SCORE_VIEW
         if (editable) {
@@ -209,10 +216,10 @@ class TrackFragment : Fragment() {
                     v.requestFocus()
                     val dialog = specialDialog(
                         v,
-                        playername,
-                        trackname,
-                        trackhint,
-                        calculation,
+                        playerName,
+                        trackName,
+                        trackHint,
+                        calculator,
                         variables,
                         multiple,
                         null
@@ -247,19 +254,19 @@ class TrackFragment : Fragment() {
     }
 
     // TODO: Make this into a Dialog class?
-    fun specialDialog(
-        scoreview: EditText,
-        playername: String,
-        trackname: String,
-        trackhint: String,
-        calculation: String,
+    private fun specialDialog(
+        scoreView: EditText,
+        playerName: String,
+        trackName: String,
+        trackHint: String,
+        calculator: SpecialCalc?,
         variables: Array<String>,
         multiple: String,
-        nextdialog: AlertDialog?
+        nextDialog: AlertDialog?
     ): AlertDialog {
-        val context = scoreview.context
+        val context = scoreView.context
         val builder = AlertDialog.Builder(context)
-        builder.setTitle("$playername - $trackname")
+        builder.setTitle("$playerName - $trackName")
 
         // Set up layout for entry
         val layout = LinearLayout(context)
@@ -267,22 +274,22 @@ class TrackFragment : Fragment() {
         layout.setPadding(8, 0, 8, 0)
         layout.orientation = LinearLayout.VERTICAL
 
-        if (trackhint.isNotBlank()) {
+        if (trackHint.isNotBlank()) {
             val hint = TextView(context)
             hint.setPadding(0, 8, 0, 0)
             hint.setTypeface(null, Typeface.ITALIC)
             hint.gravity = Gravity.CENTER
-            hint.text = trackhint
+            hint.text = trackHint
             hint.textSize = 13f
             layout.addView(hint)
         }
 
-        var first_entry: EditText? = null
-        var last_entry: EditText? = null
+        var firstEntry: EditText? = null
+        var lastEntry: EditText? = null
         // Either a single EditText or a sum TextView
         val sum: TextView
 
-        if (variables.size > 0) {
+        if (variables.isNotEmpty() && calculator != null) {
             // Create special dialog
 
             // Sum
@@ -292,11 +299,16 @@ class TrackFragment : Fragment() {
             laysum.setPadding(0, 8, 0, 0)
             val sumtext = TextView(context)
             sumtext.layoutParams = LAYOUT_PARAMS_SPECIAL_TEXT
-            sumtext.text = getString(R.string.special_dialog_name_score, trackname)
+            sumtext.text = getString(R.string.special_dialog_name_score, trackName)
             laysum.addView(sumtext)
             sum = TextView(context)
             sum.layoutParams = LAYOUT_PARAMS_SPECIAL_VALUE
-            sum.text = "0"
+            // Initialize the "zero" value for the sum which might not be zero depending on the
+            // calculation!
+            val zeroes = mutableListOf<Int>()
+            for (v in variables)
+                zeroes.add(0)
+            sum.text = calculator.calculate(zeroes).toString()
             laysum.addView(sum)
             // Created - but don't add it to layout yet
 
@@ -315,8 +327,6 @@ class TrackFragment : Fragment() {
                 multitotal.text = "0"
                 laymulti.addView(multitotal)
             }
-            // Variables & calculator
-            val calculator = SpecialCalc(calculation)
 
             for ((idx, name) in variables.withIndex()) {
                 val lay = LinearLayout(context)
@@ -364,8 +374,8 @@ class TrackFragment : Fragment() {
                         }
                     }
                 })
-                if (idx == 0) first_entry = entry
-                if (idx == variables.lastIndex) last_entry = entry
+                if (idx == 0) firstEntry = entry
+                if (idx == variables.lastIndex) lastEntry = entry
                 lay.addView(entry)
                 layout.addView(lay)
             }
@@ -400,12 +410,12 @@ class TrackFragment : Fragment() {
             lay.orientation = LinearLayout.HORIZONTAL
             val text = TextView(context)
             text.layoutParams = LAYOUT_PARAMS_SPECIAL_TEXT
-            text.text = getString(R.string.special_dialog_name_no_score, trackname)
+            text.text = getString(R.string.special_dialog_name_no_score, trackName)
             lay.addView(text)
             sum = getScoreEntry(context)
             sum.layoutParams = LAYOUT_PARAMS_SPECIAL_VALUE
-            first_entry = sum
-            last_entry = sum
+            firstEntry = sum
+            lastEntry = sum
             lay.addView(sum)
             layout.addView(lay)
         }
@@ -416,7 +426,7 @@ class TrackFragment : Fragment() {
 
         builder.setPositiveButton(android.R.string.ok,
             DialogInterface.OnClickListener { _, _ ->
-                scoreview.setText(sum.text)
+                scoreView.setText(sum.text)
                 calculateScores()
             })
 
@@ -425,28 +435,22 @@ class TrackFragment : Fragment() {
         val alert = builder.create()
         alert.setOnShowListener( DialogInterface.OnShowListener { dialog ->
             // Focus on first entry on show
-            if (first_entry != null) {
-                first_entry.requestFocus()
-            }
+            firstEntry?.requestFocus()
         })
         alert.setOnDismissListener(DialogInterface.OnDismissListener { dialog ->
             // Show next dialog if there is one
-            if (nextdialog != null) {
-                nextdialog.show()
-            }
+            nextDialog?.show()
         })
         // Make last entry's "next" action dismiss the dialog
-        if (last_entry != null) {
-            last_entry.setOnEditorActionListener { _, actionId, _ ->
-                return@setOnEditorActionListener when (actionId) {
-                    EditorInfo.IME_ACTION_NEXT -> {
-                        alert.dismiss()
-                        scoreview.setText(sum.text)
-                        calculateScores()
-                        true
-                    }
-                    else -> false
+        lastEntry?.setOnEditorActionListener { _, actionId, _ ->
+            return@setOnEditorActionListener when (actionId) {
+                EditorInfo.IME_ACTION_NEXT -> {
+                    alert.dismiss()
+                    scoreView.setText(sum.text)
+                    calculateScores()
+                    true
                 }
+                else -> false
             }
         }
 
@@ -625,8 +629,8 @@ class ScoreActivity : AppCompatActivity() {
                     "000000",
                     "",
                     null,
-                    false,
-                    true
+                    first = false,
+                    total = true
                 )
                 trans.add(R.id.trackLayout, tf)
                 trans.commit()
@@ -652,7 +656,7 @@ class ScoreActivity : AppCompatActivity() {
         }
     }
 
-    fun doConfigure() {
+    private fun doConfigure() {
         val data = supportFragmentManager.findFragmentByTag(TRACKS_LIST)
         if (data is TracksDataFragment) {
             // Simple multi-select dialog

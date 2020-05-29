@@ -28,10 +28,15 @@ class GamesParser(xmlconfig: InputStream) {
         val special: Special?
     )
 
-    data class Special(val variables: List<String>, val calculation: String, val multiple: String)
+    data class Special(
+        val variables: List<String>,
+        val calculation: String,
+        val multiple: String,
+        val lookup: List<Int>,
+        val increment: Int
+    )
 
-    // Public access to the list of games
-    var games: List<Game>
+    private var games: List<Game>
 
     init {
         games = parse(xmlconfig)
@@ -214,22 +219,26 @@ class GamesParser(xmlconfig: InputStream) {
     private fun readSpecial(parser: XmlPullParser): Special {
         parser.require(XmlPullParser.START_TAG, ns, "special")
         var calculation = ""
-        var multiple = ""   // Optional
         val variables = mutableListOf<String>()
+        var multiple = ""   // Optional
+        val lookup = mutableListOf<Int>()   // Optional
+        var increment = 0   // Optional
         while (parser.next() != XmlPullParser.END_TAG) {
             if (parser.eventType != XmlPullParser.START_TAG) {
                 continue
             }
             when (parser.name) {
                 "calculation" -> calculation = readCalculation(parser)
-                "multiple" -> multiple = readMultiple(parser)
                 "variables" -> variables.add(readVariables(parser))
+                "lookup" -> lookup.add(readLookup(parser))
+                "increment" -> increment = readIncrement(parser)
+                "multiple" -> multiple = readMultiple(parser)
                 else -> skip(parser)
             }
         }
         if (variables.size == 0)
             Log.e(TAG, "No variables specified for special calculation: $calculation")
-        return Special(variables, calculation, multiple)
+        return Special(variables, calculation, multiple, lookup, increment)
     }
 
     @Throws(IOException::class, XmlPullParserException::class)
@@ -242,7 +251,7 @@ class GamesParser(xmlconfig: InputStream) {
             ok = when (char) {
                 in '0'..'9' -> true
                 in 'A'..'Z' -> true
-                in "+-*/nx" -> true
+                in "+-*/nxl" -> true
                 else -> false
             }
             if (!ok) {
@@ -252,6 +261,14 @@ class GamesParser(xmlconfig: InputStream) {
             }
         }
         parser.require(XmlPullParser.END_TAG, ns, "calculation")
+        return result
+    }
+
+    @Throws(IOException::class, XmlPullParserException::class)
+    private fun readVariables(parser: XmlPullParser): String {
+        parser.require(XmlPullParser.START_TAG, ns, "variables")
+        val result = readText(parser)
+        parser.require(XmlPullParser.END_TAG, ns, "variables")
         return result
     }
 
@@ -271,10 +288,40 @@ class GamesParser(xmlconfig: InputStream) {
     }
 
     @Throws(IOException::class, XmlPullParserException::class)
-    private fun readVariables(parser: XmlPullParser): String {
-        parser.require(XmlPullParser.START_TAG, ns, "variables")
-        val result = readText(parser)
-        parser.require(XmlPullParser.END_TAG, ns, "variables")
+    private fun readLookup(parser: XmlPullParser): Int {
+        parser.require(XmlPullParser.START_TAG, ns, "lookup")
+        val result = readInt(parser)
+        parser.require(XmlPullParser.END_TAG, ns, "lookup")
+        return result
+    }
+
+    @Throws(IOException::class, XmlPullParserException::class)
+    private fun readIncrement(parser: XmlPullParser): Int {
+        parser.require(XmlPullParser.START_TAG, ns, "increment")
+        val result = readInt(parser)
+        parser.require(XmlPullParser.END_TAG, ns, "increment")
+        return result
+    }
+
+    // For reading all the booleans from the XML
+    @Throws(IOException::class, XmlPullParserException::class)
+    private fun readBoolean(parser: XmlPullParser): Boolean {
+        val text = readText(parser).toLowerCase()
+        if (text != "true" && text != "false")
+            Log.w(TAG, "Invalid boolean value '$text' - assuming false")
+        return (text == "true")
+    }
+
+    // For reading all the integers from the XML
+    @Throws(IOException::class, XmlPullParserException::class)
+    private fun readInt(parser: XmlPullParser): Int {
+        val text = readText(parser)
+        var result = 0
+        try {
+            result = text.toInt()
+        } catch (e: NumberFormatException) {
+            Log.w(TAG, "Invalid integer value '$text' - assuming 0")
+        }
         return result
     }
 
@@ -287,17 +334,6 @@ class GamesParser(xmlconfig: InputStream) {
             parser.nextTag()
         }
         return result
-    }
-
-    // For reading all the booleans from the XML
-    @Throws(IOException::class, XmlPullParserException::class)
-    private fun readBoolean(parser: XmlPullParser): Boolean {
-        var result = ""
-        if (parser.next() == XmlPullParser.TEXT) {
-            result = parser.text
-            parser.nextTag()
-        }
-        return (result == "true")
     }
 
     @Throws(XmlPullParserException::class, IOException::class)

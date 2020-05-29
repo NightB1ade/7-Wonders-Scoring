@@ -301,4 +301,122 @@
             </special>
         </tracks>
     </games>
+    <games>
+        <name>Neom</name>
+        <players>Board...</players>
+        <players>Coal Mine</players>
+        <players>Limestone</players>
+        <players>Mineral Vein</players>
+        <players>Gas Field</players>
+        <players>Oil Well</players>
+        <players>Rainforest</players>
+        <tracks>
+            <name>Tiles (0-9)</name>
+            <hint>scoring for numbered victory points on the tiles - top right corner</hint>
+            <colour>E65100</colour>
+            <default>true</default>
+            <special>
+                <variables>Residential total</variables>
+                <variables>Public total</variables>
+                <calculation>AB+</calculation>
+            </special>
+        </tracks>
+        <tracks>
+            <name>Tiles (?)</name>
+            <hint>scoring for question mark victory points on the tiles - top right corner</hint>
+            <colour>E65100</colour>
+            <default>true</default>
+            <special>
+                <variables>Public 1</variables>
+                <variables>Public 2</variables>
+                <variables>Public 3</variables>
+                <variables>Public 4</variables>
+                <calculation>AB+C+D+</calculation>
+            </special>
+        </tracks>
+        <tracks>
+            <name>Neighbourhoods</name>
+            <hint>scoring for residential tiles directly connected to each other score on the
+                traingular number sequence
+            </hint>
+            <colour>9CCC65</colour>
+            <default>true</default>
+            <special>
+                <variables>Residential tiles</variables>
+                <calculation>Al</calculation>
+                <lookup>0</lookup>
+                <lookup>1</lookup>
+                <lookup>3</lookup>
+                <lookup>6</lookup>
+                <lookup>10</lookup>
+                <lookup>15</lookup>
+                <lookup>21</lookup>
+                <lookup>28</lookup>
+                <lookup>36</lookup>
+                <increment>4</increment>
+                <multiple>+</multiple>
+            </special>
+        </tracks>
+        <tracks>
+            <name>Goods</name>
+            <hint>scoring for number of Goods that your city produces (ignore duplicates)</hint>
+            <colour>FFF3E0</colour>
+            <default>true</default>
+            <special>
+                <variables>Raw Good</variables>
+                <variables>Processed Good</variables>
+                <variables>Luxury Good</variables>
+                <calculation>A2B*+10C*+</calculation>
+            </special>
+        </tracks>
+        <tracks>
+            <name>Money</name>
+            <hint>scoring 1 victory point for every 2 money (rounded down)</hint>
+            <colour>E0F7FA</colour>
+            <default>true</default>
+            <special>
+                <variables>Money</variables>
+                <calculation>A2/</calculation>
+            </special>
+        </tracks>
+        <tracks>
+            <name>Pollution</name>
+            <hint>minus points for each polluting industry adjacent or diagonal to a residential
+            </hint>
+            <colour>607D8B</colour>
+            <default>true</default>
+            <special>
+                <variables>Adjacent industry</variables>
+                <variables>Diagonal industry</variables>
+                <calculation>A2*B+</calculation>
+            </special>
+        </tracks>
+        <tracks>
+            <name>Ghost Town</name>
+            <hint>minus points for having less than 2 residential tiles</hint>
+            <colour>F5F5F5</colour>
+            <default>true</default>
+            <special>
+                <variables>Residential tiles</variables>
+                <calculation>Al</calculation>
+                <lookup>-10</lookup>
+                <lookup>-4</lookup>
+                <lookup>0</lookup>
+                <increment>0</increment>
+            </special>
+        </tracks>
+        <tracks>
+            <name>Power</name>
+            <hint>minus points for not having any power tiles</hint>
+            <colour>FFEE58</colour>
+            <default>true</default>
+            <special>
+                <variables>Power tiles</variables>
+                <calculation>Al</calculation>
+                <lookup>-5</lookup>
+                <lookup>0</lookup>
+                <increment>0</increment>
+            </special>
+        </tracks>
+    </games>
 </root>
