@@ -392,8 +392,8 @@ games:
           variables:
             - Adjacent industry
             - Diagonal industry
-          # Reverse Polish Notation of: (A*2) + B
-          calculation: A2*B+
+          # Reverse Polish Notation of: 0 - ((A*2) + B)
+          calculation: 0A2*B+-
       # ----------------------------
       - name: Ghost Town
         hint: minus points for having less than 2 residential tiles

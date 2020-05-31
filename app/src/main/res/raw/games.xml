@@ -388,7 +388,7 @@
             <special>
                 <variables>Adjacent industry</variables>
                 <variables>Diagonal industry</variables>
-                <calculation>A2*B+</calculation>
+                <calculation>0A2*B+-</calculation>
             </special>
         </tracks>
         <tracks>
