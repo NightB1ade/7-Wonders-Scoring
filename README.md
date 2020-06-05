@@ -1,6 +1,6 @@
 # BGG Scorer
 
-## Version 13
+## Version 14
 
 * Simple board game scoring app which supports the following games:
   * 7 Wonders
@@ -24,16 +24,11 @@
 Current brain dump - also see TODOs in code
 
 Player entry:
-- [x] set first letter as capital on player name/type
-- [x] reduce player type list once something chosen (reset on clear)
-- [x] change NEXT button to ADD
-- [x] show player type on focus, rather than after first key?
+- [x] change DONE button to START SCORING
 - [ ] make player name recording area prettier/better...
 - [ ] player name editing after entry?
 
 Score entry:
-- [x] menu entry to return to first screen
-- [x] clear scores menu
 - [ ] Set focus on NEXT row/box if special dialog invoked
 - [ ] menu entry for help about invoking special dialog?
 - [ ] tool tip text on track buttons?
@@ -44,6 +39,12 @@ Other:
 - [ ] make the config strings be internationalized via dynamic lookup on load???
 
 Done:
+- [x] menu entry to return to first screen
+- [x] clear scores menu
+- [x] set first letter as capital on player name/type
+- [x] reduce player type list once something chosen (reset on clear)
+- [x] change NEXT button to ADD
+- [x] show player type on focus, rather than after first key?
 - [x] add MULTIPLE feature to special dialog
 - [x] BUG: Make sure totals updated after special dialog
 - [x] BUG: add auto-focus + keyboard on the special dialog

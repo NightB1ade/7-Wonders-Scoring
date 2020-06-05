@@ -1,6 +1,5 @@
 package com.stivestabletop.scorer
 
-import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
 import android.content.DialogInterface
@@ -11,7 +10,6 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.inputmethod.EditorInfo
-import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -24,9 +22,9 @@ const val PLAYER_LIST = "playerlist"
 // Simple class for storing strings between config changes!
 // For example - screen rotation (config change) can cause the main activity to be re-built
 class PlayerDataFragment : Fragment() {
-    var gamename = ""
-    var playernames = mutableListOf<String>()
-    var playertypes = mutableListOf<String>()
+    var gameName = ""
+    var playerNames = mutableListOf<String>()
+    var playerTypes = mutableListOf<String>()
 
     companion object {
         fun newInstance(): PlayerDataFragment {
@@ -48,8 +46,8 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         // Read in games info
-        val xmlconfig = resources.openRawResource(R.raw.games)
-        val gamesconfig = GamesParser(xmlconfig)
+        val xmlConfig = resources.openRawResource(R.raw.games)
+        val gamesConfig = GamesParser(xmlConfig)
 
         if (savedInstanceState == null) {
             // Create initial store of stuff
@@ -65,8 +63,8 @@ class MainActivity : AppCompatActivity() {
             // Re-use store of players to re-create view
             val view = findViewById<LinearLayout>(R.id.playersLayout)
             if (data is PlayerDataFragment)
-                for ((idx, name) in data.playernames.withIndex())
-                    view?.addView(getPlayerText(name, data.playertypes[idx]))
+                for ((idx, name) in data.playerNames.withIndex())
+                    view?.addView(getPlayerText(name, data.playerTypes[idx]))
         }
 
         // Add listener to perform add player on screen-keyboard enter
@@ -84,16 +82,16 @@ class MainActivity : AppCompatActivity() {
         val gameSpinner = findViewById<Spinner>(R.id.spinnerGame)
         val adapter = ArrayAdapter(
             this, R.layout.support_simple_spinner_dropdown_item,
-            gamesconfig.getGamesList()
+            gamesConfig.getGamesList()
         )
         gameSpinner.adapter = adapter
-        if (data is PlayerDataFragment && data.gamename.isNotBlank()) {
+        if (data is PlayerDataFragment && data.gameName.isNotBlank()) {
             // Set up previously chosen game
-            gameSpinner.setSelection(adapter.getPosition(data.gamename))
+            gameSpinner.setSelection(adapter.getPosition(data.gameName))
             setupPlayerTypes(
                 applicationContext,
-                gamesconfig.getPlayersList(data.gamename),
-                data.playertypes
+                gamesConfig.getPlayersList(data.gameName),
+                data.playerTypes
             )
         }
 
@@ -105,8 +103,8 @@ class MainActivity : AppCompatActivity() {
                 if (data is PlayerDataFragment)
                     setupPlayerTypes(
                         applicationContext,
-                        gamesconfig.getPlayersList(data.gamename),
-                        data.playertypes
+                        gamesConfig.getPlayersList(data.gameName),
+                        data.playerTypes
                     )
                 view.showDropDown()
             }
@@ -124,31 +122,31 @@ class MainActivity : AppCompatActivity() {
                 @Suppress("NAME_SHADOWING") val data =
                     supportFragmentManager.findFragmentByTag(PLAYER_LIST)
                 if (data is PlayerDataFragment) {
-                    if (data.gamename.isBlank()) {
+                    if (data.gameName.isBlank()) {
                         // Initialization
-                        data.gamename = gamename
-                        setupPlayerTypes(parent.context, gamesconfig.getPlayersList(gamename))
+                        data.gameName = gamename
+                        setupPlayerTypes(parent.context, gamesConfig.getPlayersList(gamename))
                     } else {
-                        if (data.gamename != gamename) {
-                            if (data.playernames.size > 0) {
+                        if (data.gameName != gamename) {
+                            if (data.playerNames.size > 0) {
                                 val builder = AlertDialog.Builder(parent.context)
                                 builder.apply {
                                     setPositiveButton(
                                         android.R.string.ok,
                                         DialogInterface.OnClickListener { _, _ ->
                                             // Change game and clear all data
-                                            data.gamename = gamename
+                                            data.gameName = gamename
                                             clearPlayers()
                                             setupPlayerTypes(
                                                 parent.context,
-                                                gamesconfig.getPlayersList(gamename)
+                                                gamesConfig.getPlayersList(gamename)
                                             )
                                         })
                                     setNegativeButton(
                                         android.R.string.cancel,
                                         DialogInterface.OnClickListener { _, _ ->
                                             // Reset selection
-                                            gameSpinner.setSelection(adapter.getPosition(data.gamename))
+                                            gameSpinner.setSelection(adapter.getPosition(data.gameName))
                                         })
                                     setMessage(R.string.game_change)
                                 }
@@ -156,11 +154,11 @@ class MainActivity : AppCompatActivity() {
                                 builder.create()
                                 builder.show()
                             } else {
-                                data.gamename = gamename
+                                data.gameName = gamename
                                 setupPlayerTypes(
                                     parent.context,
-                                    gamesconfig.getPlayersList(gamename),
-                                    data.playertypes
+                                    gamesConfig.getPlayersList(gamename),
+                                    data.playerTypes
                                 )
                             }
                         }
@@ -176,7 +174,7 @@ class MainActivity : AppCompatActivity() {
         // Set the next player text based on the number of players so far
         var numPlayers = 0
         if (data is PlayerDataFragment)
-            numPlayers = data.playernames.size
+            numPlayers = data.playerNames.size
         setNextPlayer(numPlayers)
         enableDone()
     }
@@ -197,33 +195,6 @@ class MainActivity : AppCompatActivity() {
             }
             else -> super.onOptionsItemSelected(item)
         }
-    }
-
-    // FIX: for keyboard not showing up when you either hit back from score activity or continue app
-    // from background
-    override fun onResume() {
-        super.onResume()
-        val imm = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY)
-    }
-
-    // FIX: for keyboard not showing when the score activity finishes (rather than back)
-    override fun onWindowFocusChanged(hasFocus: Boolean) {
-        super.onWindowFocusChanged(hasFocus)
-        if (hasFocus) {
-            val imm = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
-            imm.toggleSoftInput(
-                InputMethodManager.SHOW_FORCED,
-                InputMethodManager.HIDE_IMPLICIT_ONLY
-            )
-        }
-    }
-
-    // FIX: Part of keyboard fix - see onResume
-    override fun onPause() {
-        super.onPause()
-        val imm = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0)
     }
 
     // Set up the player type list, only show those not yet selected
@@ -248,8 +219,8 @@ class MainActivity : AppCompatActivity() {
     fun clearPlayers() {
         val data = supportFragmentManager.findFragmentByTag(PLAYER_LIST)
         if (data is PlayerDataFragment) {
-            data.playernames = mutableListOf<String>()
-            data.playertypes = mutableListOf<String>()
+            data.playerNames = mutableListOf<String>()
+            data.playerTypes = mutableListOf<String>()
             setNextPlayer(0)
             enableDone()
             val view = findViewById<LinearLayout>(R.id.playersLayout)
@@ -264,8 +235,8 @@ class MainActivity : AppCompatActivity() {
         val editText = findViewById<EditText>(R.id.editPlayer)
         val num = players + 1
         editText.setText(getString(R.string.default_player_string, num))
-        editText.requestFocus()
-        editText.selectAll()
+        // Player name view will select all on focus, but if already focused we need to re-select
+        if (editText.hasFocus()) editText.selectAll()
     }
 
     // Get a simple player name/type textview box
@@ -282,7 +253,7 @@ class MainActivity : AppCompatActivity() {
         val doneButton = findViewById<Button>(R.id.buttonDone)
         val data = supportFragmentManager.findFragmentByTag(PLAYER_LIST)
         if (data is PlayerDataFragment) {
-            if (data.playernames.size > 0) {
+            if (data.playerNames.size > 0) {
                 doneButton.isEnabled = true
                 return
             }
@@ -293,29 +264,32 @@ class MainActivity : AppCompatActivity() {
     // Add a new player to the list
     fun addPlayer(view: View) {
         val editText = findViewById<EditText>(R.id.editPlayer)
-        val playername = editText.text.toString()
+        val playerName = editText.text.toString()
         val autoText: AutoCompleteTextView = if (view is AutoCompleteTextView) {
             view
         } else {
             findViewById(R.id.autoPlayer)
         }
-        var playertype = autoText.text.toString()
+
+        var playerType = autoText.text.toString()
         // Check for no selected type
-        if (playertype.endsWith("..."))
-            playertype = ""
+        if (playerType.endsWith("..."))
+            playerType = ""
 
         val layout = findViewById<LinearLayout>(R.id.playersLayout)
 
         val data = supportFragmentManager.findFragmentByTag(PLAYER_LIST)
         if (data is PlayerDataFragment) {
-            data.playernames.add(playername)
-            data.playertypes.add(playertype)
-            setNextPlayer(data.playernames.size)
+            data.playerNames.add(playerName)
+            data.playerTypes.add(playerType)
+            setNextPlayer(data.playerNames.size)
         }
-        // add player to layout
-        layout?.addView(getPlayerText(playername, playertype))
+        // Add player to layout
+        layout?.addView(getPlayerText(playerName, playerType))
         // Enable done if we have enough players
         this.enableDone()
+        // Move to next player name, otherwise focus stays on player type
+        if (autoText.hasFocus()) editText.requestFocus()
     }
 
     // Finished entering players - move onto scoring
@@ -324,12 +298,15 @@ class MainActivity : AppCompatActivity() {
         val data = supportFragmentManager.findFragmentByTag(PLAYER_LIST)
         if (data is PlayerDataFragment) {
             val args = Bundle()
-            args.putStringArrayList(PLAYER_NAMES, ArrayList(data.playernames))
-            args.putStringArrayList(PLAYER_TYPES, ArrayList(data.playertypes))
-            args.putString(GAME_NAME, data.gamename)
+            args.putStringArrayList(PLAYER_NAMES, ArrayList(data.playerNames))
+            args.putStringArrayList(PLAYER_TYPES, ArrayList(data.playerTypes))
+            args.putString(GAME_NAME, data.gameName)
             val intent = Intent(this, ScoreActivity::class.java).apply {
                 putExtras(args)
             }
+            // FIX - for soft keyboard display issues on return from score activity
+            // Remove any current focus on this activity
+            currentFocus?.clearFocus()
             startActivity(intent)
         }
     }

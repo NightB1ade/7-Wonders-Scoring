@@ -2,7 +2,7 @@
     <string name="app_name">BGG Scorer</string>
     <string name="edit_message">Enter next players name</string>
     <string name="auto_message">Enter player type/colour</string>
-    <string name="default_player_string">player %d</string>
+    <string name="default_player_string">Player %d</string>
     <string name="special_dialog_name_score">Total %s:</string>
     <string name="special_dialog_name_no_score">%s:</string>
     <string name="special_dialog_multi_sub_total">Sub total</string>
@@ -10,7 +10,7 @@
     <string name="text_game">Game</string>
     <string name="text_player">Player</string>
     <string name="button_next">Add</string>
-    <string name="button_done">Done</string>
+    <string name="button_done">Start scoring</string>
     <string name="menu_config">Configure</string>
     <string name="menu_clear">Clear scores</string>
     <string name="menu_return">Game select</string>
