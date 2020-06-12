@@ -73,7 +73,7 @@
                     android:layout_height="match_parent"
                     android:layout_weight="0.5"
                     android:ems="10"
-                    android:hint="@string/edit_message"
+                    android:hint="@string/edit_player_name_message"
                     android:imeOptions="flagNoFullscreen|actionNext"
                     android:importantForAutofill="no"
                     android:inputType="textPersonName|textCapSentences"
@@ -89,7 +89,7 @@
                     android:layout_weight="0.5"
                     android:completionThreshold="0"
                     android:ems="10"
-                    android:hint="@string/auto_message"
+                    android:hint="@string/auto_player_type_message"
                     android:imeOptions="flagNoFullscreen|actionNext"
                     android:importantForAutofill="no"
                     android:inputType="text|textCapSentences"
@@ -104,7 +104,7 @@
                     android:layout_height="match_parent"
                     android:layout_weight="0"
                     android:onClick="addPlayer"
-                    android:text="@string/button_next" />
+                    android:text="@string/button_player_next" />
             </LinearLayout>
 
             <Button
@@ -114,21 +114,28 @@
                 android:layout_marginTop="8dp"
                 android:enabled="false"
                 android:onClick="donePlayers"
-                android:text="@string/button_done"
+                android:text="@string/button_player_done"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/linearLayoutPlayer" />
+
+            <TextView
+                android:id="@+id/textViewPlayerList"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/text_player_list"
+                app:layout_constraintStart_toStartOf="@+id/linearLayoutPlayer"
+                app:layout_constraintTop_toBottomOf="@+id/buttonDone" />
 
             <LinearLayout
                 android:id="@+id/playersLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
                 android:orientation="vertical"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/buttonDone"></LinearLayout>
+                app:layout_constraintTop_toBottomOf="@+id/textViewPlayerList"></LinearLayout>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>

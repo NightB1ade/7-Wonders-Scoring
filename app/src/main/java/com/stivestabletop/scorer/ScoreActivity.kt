@@ -430,7 +430,7 @@ class TrackFragment : Fragment() {
                 calculateScores()
             })
 
-        builder.setNegativeButton(R.string.skip, null)
+        builder.setNegativeButton(R.string.dialog_skip, null)
 
         val alert = builder.create()
         alert.setOnShowListener( DialogInterface.OnShowListener { dialog ->
@@ -660,8 +660,23 @@ class ScoreActivity : AppCompatActivity() {
                 finish()
                 true
             }
+            R.id.menu_help -> {
+                helpDialog()
+                true
+            }
             else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    private fun helpDialog() {
+        val builder = AlertDialog.Builder(this)
+        builder.apply {
+            setPositiveButton(android.R.string.ok, null)
+            setTitle(R.string.menu_help)
+            setMessage(R.string.dialog_help_score_text)
+        }
+        builder.create()
+        builder.show()
     }
 
     private fun doConfigure() {
@@ -670,7 +685,7 @@ class ScoreActivity : AppCompatActivity() {
             // Simple multi-select dialog
             val actives = data.getActives()
             val builder = AlertDialog.Builder(this)
-            builder.setTitle(R.string.score_conf)
+            builder.setTitle(R.string.dialog_score_conf)
             builder.setMultiChoiceItems(
                 data.getTrackNames(), actives
             ) { _, which, isChecked ->

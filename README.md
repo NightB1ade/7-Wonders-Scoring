@@ -1,4 +1,4 @@
-# BGG Scorer
+# BG Scorer
 
 ## Version 14
 
@@ -24,14 +24,12 @@
 Current brain dump - also see TODOs in code
 
 Player entry:
-- [x] change DONE button to START SCORING
-- [ ] make player name recording area prettier/better...
+- [x] make player name recording area prettier/better...
 - [ ] player name editing after entry?
 
 Score entry:
 - [ ] Set focus on NEXT row/box if special dialog invoked
-- [ ] menu entry for help about invoking special dialog?
-- [ ] tool tip text on track buttons?
+- [x] menu entry for help about invoking special dialog?
 - [ ] dialog at end declaring winner on final score entry?
 - [ ] calculator dialog
 
@@ -39,6 +37,7 @@ Other:
 - [ ] make the config strings be internationalized via dynamic lookup on load???
 
 Done:
+- [x] change DONE button to START SCORING
 - [x] menu entry to return to first screen
 - [x] clear scores menu
 - [x] set first letter as capital on player name/type

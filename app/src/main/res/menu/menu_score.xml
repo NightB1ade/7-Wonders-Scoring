@@ -10,4 +10,7 @@
     <item
         android:id="@+id/menu_return"
         android:title="@string/menu_return" />
+    <item
+        android:id="@+id/menu_help"
+        android:title="@string/menu_help" />
 </menu>

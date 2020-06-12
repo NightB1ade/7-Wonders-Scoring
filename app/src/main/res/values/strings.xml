@@ -1,7 +1,12 @@
 <resources>
-    <string name="app_name">BGG Scorer</string>
-    <string name="edit_message">Enter next players name</string>
-    <string name="auto_message">Enter player type/colour</string>
+    <string name="app_name">BG Scorer</string>
+    <string name="app_version">proto v14</string>
+    <string name="app_project_url">https://github.com/NightB1ade/7-Wonders-Scoring/tree/proto</string>
+    <string name="dialog_about_copyright">Copyright © 2020, Jeremy Johnson and Ross D\'Souza</string>
+    <string name="dialog_about_project">github project</string>
+    <string name="dialog_about_version">version: %s</string>
+    <string name="edit_player_name_message">Enter next players name</string>
+    <string name="auto_player_type_message">Enter player type/colour</string>
     <string name="default_player_string">Player %d</string>
     <string name="special_dialog_name_score">Total %s:</string>
     <string name="special_dialog_name_no_score">%s:</string>
@@ -9,14 +14,26 @@
     <string name="special_dialog_multi_button">Save as sub-total</string>
     <string name="text_game">Game</string>
     <string name="text_player">Player</string>
-    <string name="button_next">Add</string>
-    <string name="button_done">Start scoring</string>
+    <string name="text_player_list">Player list</string>
+    <string name="button_player_next">Add</string>
+    <string name="button_player_done">Start scoring</string>
     <string name="menu_config">Configure</string>
     <string name="menu_clear">Clear scores</string>
     <string name="menu_return">Game select</string>
-    <string name="score_conf">Choose score tracks</string>
-    <string name="game_change">Changing game will clear the players. Are you sure?</string>
     <string name="menu_reset">Clear players</string>
-    <string name="skip">Skip</string>
-    <string name="version">proto v13</string>
+    <string name="menu_about">About</string>
+    <string name="menu_help">Help</string>
+    <string name="dialog_score_conf">Choose score tracks</string>
+    <string name="dialog_game_change">Changing game will clear the players. Are you sure?</string>
+    <string name="dialog_skip">Skip</string>
+    <string name="dialog_help_score_text">
+        Just enter the scores per player for each of the score tracks for the game, and the totals will be calculated as you go in the Total track.\n
+        \n
+        If you need more information about a particular score track or help calculating the score you can activate the score helper dialog by either:\n
+        1) performing a long press on a single score entry to edit that score only; or\n
+        2) pressing on the score track name to edit every players score in turn for that track.\n
+        \n
+        The score helper dialog provides hints about the score that needs to be entered and has auto-calculation help for that particular scoring track.\n
+        For more complicated scoring tracks it may offer a sub-total button that allows you to calculate multiple scoring parts before setting the final total for that track.
+    </string>
 </resources>

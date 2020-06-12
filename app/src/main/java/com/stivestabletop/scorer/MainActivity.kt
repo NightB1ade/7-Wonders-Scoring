@@ -5,6 +5,10 @@ import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
+import android.text.SpannableStringBuilder
+import android.text.Spanned
+import android.text.method.LinkMovementMethod
+import android.text.style.URLSpan
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
@@ -12,7 +16,10 @@ import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.text.bold
+import androidx.core.text.italic
 import androidx.fragment.app.Fragment
+
 
 const val PLAYER_NAMES = "playernames"
 const val PLAYER_TYPES = "playertypes"
@@ -148,7 +155,7 @@ class MainActivity : AppCompatActivity() {
                                             // Reset selection
                                             gameSpinner.setSelection(adapter.getPosition(data.gameName))
                                         })
-                                    setMessage(R.string.game_change)
+                                    setMessage(R.string.dialog_game_change)
                                 }
                                 // Create the AlertDialog
                                 builder.create()
@@ -193,8 +200,40 @@ class MainActivity : AppCompatActivity() {
                 clearPlayers()
                 true
             }
+            R.id.menu_about -> {
+                aboutDialog()
+                true
+            }
             else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    private fun aboutDialog() {
+        val builder = AlertDialog.Builder(this)
+        builder.apply {
+            setPositiveButton(android.R.string.ok, null)
+            val string = SpannableStringBuilder()
+            string.apply {
+                bold { appendln(getString(R.string.app_name)) }
+                appendln()
+                italic { appendln(getString(R.string.dialog_about_copyright)) }
+                appendln()
+            }
+            val spanStart = string.length
+            string.appendln(getString(R.string.dialog_about_project))
+            val projectUrl = URLSpan(getString(R.string.app_project_url))
+            val spanEnd = string.length
+            string.apply {
+                setSpan(projectUrl, spanStart, spanEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                appendln()
+                appendln(getString(R.string.dialog_about_version, getString(R.string.app_version)))
+            }
+            setMessage(string)
+        }
+        val dialog = builder.create()
+        dialog.show()
+        val msgText = dialog.findViewById<TextView>(android.R.id.message)
+        msgText.movementMethod = LinkMovementMethod.getInstance()
     }
 
     // Set up the player type list, only show those not yet selected
