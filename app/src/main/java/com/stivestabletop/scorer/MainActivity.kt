@@ -1,5 +1,6 @@
 package com.stivestabletop.scorer
 
+import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
 import android.content.DialogInterface
@@ -14,6 +15,7 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.text.bold
@@ -204,6 +206,17 @@ class MainActivity : AppCompatActivity() {
                 aboutDialog()
                 true
             }
+            R.id.menu_keyboardfix -> {
+                // FIX "flagNoFullScreen": if you hide the keyboard on Android 7, you can't get it
+                // back due to a bug with the edittext views that force "flagNoFullScreen"
+                // Unfortunately it can hide the keyboard on a resume
+                val imm = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+                imm.toggleSoftInput(
+                    InputMethodManager.SHOW_FORCED,
+                    InputMethodManager.HIDE_IMPLICIT_ONLY
+                )
+                true
+            }
             else -> super.onOptionsItemSelected(item)
         }
     }
@@ -331,6 +344,15 @@ class MainActivity : AppCompatActivity() {
         if (autoText.hasFocus()) editText.requestFocus()
     }
 
+    // FIX "flagNoFullScreen": for soft  keyboard not showing up when you either hit back
+    // from score activity when it is currently is hidden
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (currentFocus != null) {
+            recreate()
+        }
+    }
+
     // Finished entering players - move onto scoring
     @Suppress("UNUSED_PARAMETER")
     fun donePlayers(v: View) {
@@ -343,10 +365,10 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(this, ScoreActivity::class.java).apply {
                 putExtras(args)
             }
-            // FIX - for soft keyboard display issues on return from score activity
-            // Remove any current focus on this activity
+            // FIX "flagNoFullScreen": soft keyboard display issues on return from score activity
+            // Remove any current focus on this activity (only works on later versions of API)
             currentFocus?.clearFocus()
-            startActivity(intent)
+            startActivityForResult(intent, 1)
         }
     }
 }

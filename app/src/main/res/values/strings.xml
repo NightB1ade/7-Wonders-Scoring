@@ -23,6 +23,7 @@
     <string name="menu_reset">Clear players</string>
     <string name="menu_about">About</string>
     <string name="menu_help">Help</string>
+    <string name="menu_keyboard">Show keyboard</string>
     <string name="dialog_score_conf">Choose score tracks</string>
     <string name="dialog_game_change">Changing game will clear the players. Are you sure?</string>
     <string name="dialog_skip">Skip</string>

@@ -5,6 +5,9 @@
         android:id="@+id/menu_clear"
         android:title="@string/menu_reset" />
     <item
+        android:id="@+id/menu_keyboardfix"
+        android:title="@string/menu_keyboard" />
+    <item
         android:id="@+id/menu_about"
         android:title="@string/menu_about" />
 </menu>
