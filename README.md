@@ -1,12 +1,13 @@
 # BG Scorer
 
-## Version 14
+## Version 15
 
 * Simple board game scoring app which supports the following games:
   * 7 Wonders
   * Kingdomino & Queendomino
   * Underwater cities
   * Neom
+  * Orleans
  
 * First screen is game chooser and player name/type entry
   * List of players names recorded and shown

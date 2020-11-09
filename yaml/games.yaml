@@ -1,5 +1,7 @@
 # Convert this to XML using: https://codebeautify.org/yaml-to-json-xml-csv
-# Note: It can sometimes get the colours wrong e.g. 009900 gets converted to 0
+# Notes:
+#   * The convertor can sometimes get the colours wrong e.g. 009900 gets converted to 0
+#   * The Android XML Parser does NOT like "&" (ampersand) and will bomb out on load
 
 games:
   # ----------------------------------------------------------------------------------------------
@@ -427,3 +429,43 @@ games:
             - 0
           # Additional value for each integer increment that exceeds look up table
           increment: 0
+  # ----------------------------------------------------------------------------------------------
+  - name: Orleans
+    players:
+      - Colour...
+      - Blue
+      - Green
+      - Red
+      - Yellow
+    tracks:
+    # ----------------------------
+    - name: Coins
+      hint: 1 VP per coin
+      colour: 9B7A19
+      default: true
+      # ----------------------------
+    - name: Goods
+      hint: VP per goods at the end
+      colour: FFF3E0
+      default: true
+      special:
+        variables:
+          - Brocade
+          - Wool
+          - Wine
+          - Cheese
+          - Grain
+        # Reverse Polish Notation of: (5*A) + (4*B) + (3*C) + (2*D) + E
+        calculation: 5A*4B*+3C*+2D*+E+
+    # ----------------------------
+    - name: Development
+      hint: trading stations built and citizen tiles collected times development status
+      colour: F5B463
+      default: true
+      special:
+        variables:
+          - Trading stations
+          - Citizens
+          - Development status
+        # Reverse Polish Notation of: (A+B) * C
+        calculation: AB+C*

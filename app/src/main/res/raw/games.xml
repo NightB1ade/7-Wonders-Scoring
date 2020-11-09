@@ -208,8 +208,7 @@
         </tracks>
         <tracks>
             <name>Territories</name>
-            <hint>points for buildings that have multipliers for number of separate territories
-            </hint>
+            <hint>points for buildings that have multipliers for number of separate territories</hint>
             <colour>E42E24</colour>
             <default>false</default>
             <special>
@@ -248,9 +247,7 @@
         </tracks>
         <tracks>
             <name>Metropolis</name>
-            <hint>final-scoring tiles - the brown metropolis in the upper left of your board if
-                connected by both tunnels and bonus brown metropolis if any
-            </hint>
+            <hint>final-scoring tiles - the brown metropolis in the upper left of your board if connected by both tunnels and bonus brown metropolis if any</hint>
             <colour>993300</colour>
             <default>true</default>
             <special>
@@ -287,8 +284,7 @@
         </tracks>
         <tracks>
             <name>Resources</name>
-            <hint>scoring your resources - conversion into credits and divide by 4 to get points
-            </hint>
+            <hint>scoring your resources - conversion into credits and divide by 4 to get points</hint>
             <colour>7FFFD4</colour>
             <default>true</default>
             <special>
@@ -336,9 +332,7 @@
         </tracks>
         <tracks>
             <name>Neighbourhoods</name>
-            <hint>scoring for residential tiles directly connected to each other score on the
-                traingular number sequence
-            </hint>
+            <hint>scoring for residential tiles directly connected to each other score on the traingular number sequence</hint>
             <colour>9CCC65</colour>
             <default>true</default>
             <special>
@@ -381,8 +375,7 @@
         </tracks>
         <tracks>
             <name>Pollution</name>
-            <hint>minus points for each polluting industry adjacent or diagonal to a residential
-            </hint>
+            <hint>minus points for each polluting industry adjacent or diagonal to a residential</hint>
             <colour>607D8B</colour>
             <default>true</default>
             <special>
@@ -416,6 +409,46 @@
                 <lookup>-5</lookup>
                 <lookup>0</lookup>
                 <increment>0</increment>
+            </special>
+        </tracks>
+    </games>
+    <games>
+        <name>Orleans</name>
+        <players>Colour...</players>
+        <players>Blue</players>
+        <players>Green</players>
+        <players>Red</players>
+        <players>Yellow</players>
+        <tracks>
+            <name>Coins</name>
+            <hint>1 VP per coin</hint>
+            <colour>9B7A19</colour>
+            <default>true</default>
+        </tracks>
+        <tracks>
+            <name>Goods</name>
+            <hint>VP per goods at the end</hint>
+            <colour>FFF3E0</colour>
+            <default>true</default>
+            <special>
+                <variables>Brocade</variables>
+                <variables>Wool</variables>
+                <variables>Wine</variables>
+                <variables>Cheese</variables>
+                <variables>Grain</variables>
+                <calculation>5A*4B*+3C*+2D*+E+</calculation>
+            </special>
+        </tracks>
+        <tracks>
+            <name>Development</name>
+            <hint>trading stations built and citizen tiles collected times development status</hint>
+            <colour>F5B463</colour>
+            <default>true</default>
+            <special>
+                <variables>Trading stations</variables>
+                <variables>Citizens</variables>
+                <variables>Development status</variables>
+                <calculation>AB+C*</calculation>
             </special>
         </tracks>
     </games>
