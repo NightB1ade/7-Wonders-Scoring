@@ -24,14 +24,16 @@
         <players>The Great Wall</players>
         <players>Venezia</players>
         <tracks>
-            <name>Military</name>
+            <name>Military / Naval</name>
             <colour>E62E25</colour>
             <hint>score for all military tokens including losses</hint>
             <default>true</default>
             <special>
-                <variables>Victories</variables>
-                <variables>Losses</variables>
-                <calculation>AB-</calculation>
+                <variables>Ground Victories</variables>
+                <variables>Ground Losses</variables>
+                <variables>Naval Victories</variables>
+                <variables>Naval Losses</variables>
+                <calculation>AB-CD-+</calculation>
             </special>
         </tracks>
         <tracks>
@@ -86,6 +88,31 @@
                 <variables>Guild 3</variables>
                 <variables>Guild 4</variables>
                 <calculation>AB+C+D+</calculation>
+            </special>
+        </tracks>
+        <tracks>
+            <name>Guilds Armada</name>
+            <colour>902796</colour>
+            <hint>score for all purple guild building cards (limit of 10 per guild for the armada game)</hint>
+            <default>false</default>
+            <special>
+                <variables>Guild 1</variables>
+                <variables>Guild 2</variables>
+                <variables>Guild 3</variables>
+                <variables>Guild 4</variables>
+                <calculation>A10nB10n+C10n+D10n+</calculation>
+            </special>
+        </tracks>
+        <tracks>
+            <name>Isles / Fleets</name>
+            <colour>1AFF1A</colour>
+            <hint>score for islands and how far blue fleet managed to go</hint>
+            <default>false</default>
+            <special>
+                <variables>Blue fleet</variables>
+                <variables>Victory Isles</variables>
+                <variables>Special Isles</variables>
+                <calculation>AB+C+</calculation>
             </special>
         </tracks>
         <tracks>

@@ -1,9 +1,9 @@
 # BG Scorer
 
-## Version 15
+## Version 16
 
 * Simple board game scoring app which supports the following games:
-  * 7 Wonders
+  * 7 Wonders (Cities, Leaders & Armada expansions)
   * Kingdomino & Queendomino
   * Underwater cities
   * Neom

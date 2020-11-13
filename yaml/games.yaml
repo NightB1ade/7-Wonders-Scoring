@@ -30,16 +30,18 @@ games:
       - Venezia
     tracks:
       # ----------------------------
-      - name: Military
+      - name: Military / Naval
         colour: E62E25
         hint: score for all military tokens including losses
         default: true
         special:
           variables:
-            - Victories
-            - Losses
-          # Reverse Polish Notation of: A - B
-          calculation: AB-
+            - Ground Victories
+            - Ground Losses
+            - Naval Victories
+            - Naval Losses
+          # Reverse Polish Notation of: (A - B) + (C - D)
+          calculation: AB-CD-+
       # ----------------------------
       - name: Coins / Debt
         hint: scoring 1 point for every three coins and -1 point for debt tokens
@@ -91,6 +93,31 @@ games:
             - Guild 4
           # Reverse Polish Notation of: A + B + C + D
           calculation: AB+C+D+
+      # ----------------------------
+      - name: Guilds Armada
+        colour: 902796
+        hint: score for all purple guild building cards (limit of 10 per guild for the armada game)
+        default: false
+        special:
+          variables:
+            - Guild 1
+            - Guild 2
+            - Guild 3
+            - Guild 4
+          # Reverse Polish Notation of: min(A,10) + min(B,10) + min(C,10) + min(D,10)
+          calculation: A10nB10n+C10n+D10n+
+      # ----------------------------
+      - name: Isles / Fleets
+        colour: 1AFF1A
+        hint: score for islands and how far blue fleet managed to go
+        default: false
+        special:
+          variables:
+            - Blue fleet
+            - Victory Isles
+            - Special Isles
+          # Reverse Polish Notation of: A + B + C
+          calculation: AB+C+
       # ----------------------------
       - name: Leaders
         colour: FFFFFF

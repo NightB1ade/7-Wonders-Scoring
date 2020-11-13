@@ -46,7 +46,7 @@ class GamesParser(xmlconfig: InputStream) {
         val list = mutableListOf<String>()
         for (game in games)
             list.add(game.name)
-        return list
+        return list.sorted()
     }
 
     fun getPlayersList(gamename: String): List<String> {

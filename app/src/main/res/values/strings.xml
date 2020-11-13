@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">BG Scorer</string>
-    <string name="app_version">proto v15</string>
+    <string name="app_version">proto v16</string>
     <string name="app_project_url">https://github.com/NightB1ade/7-Wonders-Scoring/tree/proto</string>
     <string name="dialog_about_copyright">Copyright © 2020, Jeremy Johnson and Ross D\'Souza</string>
     <string name="dialog_about_project">github project</string>
